@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 
 from tkinter import StringVar
+import tkinter
 import customtkinter as ctk
 from PIL import Image, ImageTk
 import matplotlib
@@ -16,8 +17,29 @@ class App(ctk.CTk):
 	WIDTH = 780
 	HEIGHT = 520
 
+	# Thermocycler Settings:
+	thermocyclers = {
+		'clamp': {
+			'A': True, # True (Raised, homed), False (Lowered)
+			'B': True,
+			'C': True,
+			'D': True,
+			},
+		'tray': {
+			'AB': True, # True (Open, homed), False (Closed),
+			'CD': True, # True (Open, homed), False (Closed),
+			},
+		'temperatures': {
+			'A': np.array([92,92, 55, 55, 84, 84]),
+			'B': np.array([92,92, 60, 60, 95, 95]),
+			'C': np.array([92,92, 55, 55, 84, 84]),
+			'D': np.array([92,92, 55, 55, 84, 84]),
+			}
+		}
+
 	def __init__(self):
 		super().__init__()
+		self.bind('<Motion>', self.motion)
 		
 		self.title("CDP 2.0 GUI")
 		self.geometry(f"{self.WIDTH}x{self.HEIGHT}")
@@ -64,47 +86,83 @@ class App(ctk.CTk):
 			self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='Thermocycler', font=("Roboto Light", -16))
 			self.label_thermocycler.place(x=0, y=40)
 			thermocycler_options = StringVar()
-			thermocycler_options.set('All')
-			self.optionmenu_thermocycler = ctk.CTkOptionMenu(master=self.frame_right, variable=thermocycler_options, values=('A', 'B', 'C', 'D', 'All'))
+			thermocycler_options.set('A')
+			self.optionmenu_thermocycler = ctk.CTkOptionMenu(master=self.frame_right, variable=thermocycler_options, values=('A', 'B', 'C', 'D'))
 			self.optionmenu_thermocycler.place(x=150, y=40)
 			self.label_thermocycler_cycles = ctk.CTkLabel(master=self.frame_right, text='Cycles', font=("Roboto Light", -16))
 			self.label_thermocycler_cycles.place(x=0, y=80)
 			self.entry_thermocycler_cycles = ctk.CTkEntry(master=self.frame_right)
 			self.entry_thermocycler_cycles.place(x=150, y=80)
 			image = Image.open('thermocycler_homed.png').resize((250, 470))
-			self.img_thermocycler_a = ImageTk.PhotoImage(image)
-			self.label_thermocycler_a = ctk.CTkLabel(master=self.frame_right, text='', image=self.img_thermocycler_a)
-			self.label_thermocycler_a.place(x=310, y=5) 
+			self.img_thermocycler = ImageTk.PhotoImage(image)
+			self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='thermocycler', font=("Roboto Light", -1), image=self.img_thermocycler)
+			self.label_thermocycler.place(x=310, y=5) 
+			self.label_thermocycler.bind('<Button-1>', self.on_click)
 			self.button_start_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Start', command=self.start_thermocyclers())
 			self.button_start_thermocyclers.place(x=5, y=445, width=100)
 			self.button_import = ctk.CTkButton(master=self.frame_right, text='Import', command=self.import_thermocyclers())
 			self.button_import.place(x=115, y=445, width=95)
 			self.button_export = ctk.CTkButton(master=self.frame_right, text='Export', command=self.export_thermocyclers())
-			self.button_export.place(x=215, y=445, width=95)
-			#image = Image.open('thermocycle_plot.png').resize((295, 310))
-			#self.img_thermocycler_plot = ImageTk.PhotoImage(image)
-			#self.label_thermocycler_plot = ctk.CTkLabel(master=self.frame_right, image=self.img_thermocycler_plot)
-			#self.label_thermocycler_plot.place(x=10, y=120) 
-			fig = Figure(figsize=(3,3))
-			a = fig.add_subplot(111)
-			data = np.array([92,92,55,55,84,84])
-			x = np.array([1,2,3,4,5,6])
-			a.set_yticks([92,55,84])
-			a.set_xticks([])
-			a.axvline(x=2.5)
-			a.axvline(x=4.5)
-			a.plot(x, data, color='red')
-			canvas = FigureCanvasTkAgg(fig, master=self.frame_right)
-			canvas.get_tk_widget().place(x=10, y=120)
-			canvas.draw()
+			self.button_export.place(x=215, y=445, width=95) 
+			#fig = Figure(figsize=(3,2.4))
+			#a = fig.add_subplot(111)
+			#data = np.array([92,92,55,55,84,84])
+			#x = np.array([1,2,3,4,5,6])
+			#a.set_yticks([92,55,84])
+			#a.set_xticks([])
+			#a.axvline(x=2.5)
+			#a.axvline(x=4.5)
+			#a.plot(x, data, color='red')
+			#canvas = FigureCanvasTkAgg(fig, master=self.frame_right)
+			#canvas.get_tk_widget().place(x=10, y=120)
+			#canvas.draw()
+			self.plot_thermocycler(self.thermocyclers['temperatures']['A'])
 			self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Denature', font=("Roboto Light",-16))
 			self.label_thermocycler_denature.place(x=10, y=120, width=100)
 			self.label_thermocycler_anneal = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Anneal', font=("Roboto Light", -16))
 			self.label_thermocycler_anneal.place(x=110, y=120, width=100)
 			self.label_thermocycler_extension = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Extension', font=("Roboto Light", -16))
 			self.label_thermocycler_extension.place(x=210, y=120, width=100)
+			image = Image.open('thermostat.png').resize((24,24))
+			self.img_thermostat = ImageTk.PhotoImage(image)
+			self.label_thermostat = ctk.CTkLabel(master=self.frame_right, text='', bg_color='white', image=self.img_thermostat)
+			self.label_thermostat.place(x=15, y=365)
+			thermostat_denature_sv = StringVar()
+			thermostat_denature_sv.trace('w', lambda name, index, mode, sv=thermostat_denature_sv: self.callback_denature_temperature(thermostat_denature_sv))
+			self.entry_thermostat_denature = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=thermostat_denature_sv)
+			self.entry_thermostat_denature.place(x=65, y=365)
+			thermostat_anneal_sv = StringVar()
+			thermostat_anneal_sv.trace('w', lambda name, index, mode, sv=thermostat_anneal_sv: self.callback_anneal_temperature(thermostat_anneal_sv))
+			self.entry_thermostat_anneal = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=thermostat_anneal_sv)
+			self.entry_thermostat_anneal.place(x=145, y=365)
+			thermostat_extension_sv = StringVar()
+			thermostat_extension_sv.trace('w', lambda name, index, mode, sv=thermostat_extension_sv: self.callback_extension_temperature(thermostat_extension_sv))
+			self.entry_thermostat_extension = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=thermostat_extension_sv)
+			self.entry_thermostat_extension.place(x=225, y=365)
+			self.label_units_denature_C = ctk.CTkLabel(master=self.frame_right, text='C', font=("Roboto Light",-16))
+			self.label_units_anneal_C = ctk.CTkLabel(master=self.frame_right, text='C', font=("Roboto Light",-16))
+			self.label_units_extension_C = ctk.CTkLabel(master=self.frame_right, text='C', font=("Roboto Light",-16))
+			self.label_units_denature_C.place(x=107, y=365)
+			self.label_units_anneal_C.place(x=187, y=365)
+			self.label_units_extension_C.place(x=267, y=365)
+			image = Image.open('clock.png').resize((24,24))
+			self.img_clock = ImageTk.PhotoImage(image)
+			self.label_clock = ctk.CTkLabel(master=self.frame_right, text='', bg_color='white', image=self.img_clock)
+			self.label_clock.place(x=15, y=395)
+			self.entry_clock_denature = ctk.CTkEntry(master=self.frame_right, width=40)
+			self.entry_clock_denature.place(x=65, y=395)
+			self.entry_clock_anneal = ctk.CTkEntry(master=self.frame_right, width=40)
+			self.entry_clock_anneal.place(x=145, y=395)
+			self.entry_clock_extension = ctk.CTkEntry(master=self.frame_right, width=40)
+			self.entry_clock_extension.place(x=225, y=395)
+			self.label_units_denature_time = ctk.CTkLabel(master=self.frame_right, text='min', font=("Roboto Light",-16))
+			self.label_units_anneal_time = ctk.CTkLabel(master=self.frame_right, text='sec', font=("Roboto Light",-16))
+			self.label_units_extension_time = ctk.CTkLabel(master=self.frame_right, text='sec', font=("Roboto Light",-16))
+			self.label_units_denature_time.place(x=107, y=395)
+			self.label_units_anneal_time.place(x=187, y=395)
+			self.label_units_extension_time.place(x=267, y=395)
 		elif button_text == "Build Protocol":
-			self.label_build_protocol_1 = ctk.CTkLabel(self.frame_right, text="Build Protocl", font=("Roboto Medium", -16))
+			self.label_build_protocol_1 = ctk.CTkLabel(self.frame_right, text="Build Protocol", font=("Roboto Medium", -16))
 			self.label_build_protocol_1.grid(row=1, column=0, pady=10, padx=10)
 		elif button_text == 'Optimize':
 			image = Image.open('deck_plate.png').resize((560, 430))
@@ -145,11 +203,87 @@ class App(ctk.CTk):
 	def export_thermocyclers(self) -> None:
 		print("HERE")
 
+	def plot_thermocycler(self, data) -> None:
+		fig = Figure(figsize=(3,2.4))
+		a = fig.add_subplot(111)
+		data = np.array([92,92,55,55,84,84])
+		x = np.array([1,2,3,4,5,6])
+		a.set_yticks([data[0],data[2],data[4]])
+		a.set_xticks([])
+		a.axvline(x=2.5)
+		a.axvline(x=4.5)
+		a.plot(x, data, color='red')
+		canvas = FigureCanvasTkAgg(fig, master=self.frame_right)
+		canvas.get_tk_widget().place(x=10, y=120)
+		canvas.draw()
+		#self.plot_thermocycler(self.thermocycler['temperatures']['A'])
+		#self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Denature', font=("Roboto Light",-16))
+		#self.label_thermocycler_denature.place(x=10, y=120, width=100)
+		#self.label_thermocycler_anneal = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Anneal', font=("Roboto Light", -16))
+		#self.label_thermocycler_anneal.place(x=110, y=120, width=100)
+		#self.label_thermocycler_extension = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Extension', font=("Roboto Light", -16))
+		#self.label_thermocycler_extension.place(x=210, y=120, width=100)
+
+	def on_click(self, event):
+		x,y = event.x, event.y
+		#print(f"{x}, {y}")
+		if type(event.widget) == tkinter.Label:
+			# Get label text.
+			label_text = event.widget.cget('text')
+			if label_text == 'thermocycler':
+				# Check what the user is hovering over.
+				if x >= 130 and x <= 238:
+					if y >= 30 and y <= 124:
+						# Toggle the heater if possible.
+						print('A')
+					elif y >= 128 and y <= 222:
+						print('B')
+					elif y >= 248 and y <= 345:
+						print('C')
+					elif y >= 348 and y <= 446:
+						print('D')
+				elif x >= 7	and x <= 118:
+					if y >= 8 and y <= 234:
+						print('AB')
+					elif y >= 238 and y <= 464:
+						print('CD')
+
+	def motion(self, event) -> None:
+		x,y = event.x, event.y
+		#print(f"{x}, {y}")
+
+	def callback_denature_temperature(self, sv):
+		print(sv.get())
+		thermocycler = self.optionmenu_thermocycler.cget('variable').get()
+		# Update the data.
+		self.thermocyclers['temperatures'][thermocycler] = np.array([90,90,40,40,80,80])
+		self.plot_thermocycler(self.thermocyclers['temperatures'][thermocycler])
+		print('here')
+
+	def callback_anneal_temperature(self, sv):
+		print(sv.get())
+
+	def callback_extension_temperature(self, sv):
+		print(sv.get())
+
+	def enter(self, event):
+		# Get the entry name.
+		#print(dir(event.widget))
+		#print(event.widget.winfo_name)
+		print(event.widget.winfo_pathname)
+
 	def on_closing(self, event=0) -> None:
 		self.destroy()
 
+def motion(event):
+	x, y = event.x, event.y
+	print(f"{x}, {y}")
+
 if __name__ == '__main__':
 	app = App()
+	app.iconbitmap('bio-rad-logo.ico')
+	#app.bind('<Motion>', motion)
+	app.bind('<Return>', app.enter)
 	app.maxsize(780,520)
 	app.minsize(780,520)
 	app.mainloop()
