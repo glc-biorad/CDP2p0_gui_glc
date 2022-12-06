@@ -34,7 +34,23 @@ class App(ctk.CTk):
 			'B': np.array([92,92, 60, 60, 95, 95]),
 			'C': np.array([92,92, 55, 55, 84, 84]),
 			'D': np.array([92,92, 55, 55, 84, 84]),
-			}
+			},
+		'times': {
+			'A': {'denature': 5, 'anneal': 80, 'extension': 40},
+			'B': {'denature': 10, 'anneal': 80, 'extension': 40},
+			'C': {'denature': 5, 'anneal': 80, 'extension': 40},
+			'D': {'denature': 5, 'anneal': 80, 'extension': 40},
+			},
+		'trays': {
+			'AB': {'homed': True},
+			'CD': {'homed': True},
+			},
+		'clamps': {
+			'A': {'homed': True},
+			'B': {'homed': True},
+			'C': {'homed': True},
+			'D': {'homed': True},
+			},
 		}
 
 	def __init__(self):
@@ -93,7 +109,7 @@ class App(ctk.CTk):
 			self.label_thermocycler_cycles.place(x=0, y=80)
 			self.entry_thermocycler_cycles = ctk.CTkEntry(master=self.frame_right)
 			self.entry_thermocycler_cycles.place(x=150, y=80)
-			image = Image.open('thermocycler_homed.png').resize((250, 470))
+			image = Image.open('thermocycler.png').resize((250, 470))
 			self.img_thermocycler = ImageTk.PhotoImage(image)
 			self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='thermocycler', font=("Roboto Light", -1), image=self.img_thermocycler)
 			self.label_thermocycler.place(x=310, y=5) 
@@ -127,17 +143,21 @@ class App(ctk.CTk):
 			self.img_thermostat = ImageTk.PhotoImage(image)
 			self.label_thermostat = ctk.CTkLabel(master=self.frame_right, text='', bg_color='white', image=self.img_thermostat)
 			self.label_thermostat.place(x=15, y=365)
+			thermocycler = str(self.optionmenu_thermocycler.cget('variable').get())
 			thermostat_denature_sv = StringVar()
-			thermostat_denature_sv.trace('w', lambda name, index, mode, sv=thermostat_denature_sv: self.callback_denature_temperature(thermostat_denature_sv))
+			thermostat_denature_sv.set(str(self.thermocyclers['temperatures'][thermocycler][0]))
 			self.entry_thermostat_denature = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=thermostat_denature_sv)
+			self.entry_thermostat_denature.bind('<FocusOut>', self.callback_thermocycler_temperatures)
 			self.entry_thermostat_denature.place(x=65, y=365)
 			thermostat_anneal_sv = StringVar()
-			thermostat_anneal_sv.trace('w', lambda name, index, mode, sv=thermostat_anneal_sv: self.callback_anneal_temperature(thermostat_anneal_sv))
+			thermostat_anneal_sv.set(str(self.thermocyclers['temperatures'][thermocycler][2]))
 			self.entry_thermostat_anneal = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=thermostat_anneal_sv)
+			self.entry_thermostat_anneal.bind('<FocusOut>', self.callback_thermocycler_temperatures)
 			self.entry_thermostat_anneal.place(x=145, y=365)
 			thermostat_extension_sv = StringVar()
-			thermostat_extension_sv.trace('w', lambda name, index, mode, sv=thermostat_extension_sv: self.callback_extension_temperature(thermostat_extension_sv))
+			thermostat_extension_sv.set(str(self.thermocyclers['temperatures'][thermocycler][4]))
 			self.entry_thermostat_extension = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=thermostat_extension_sv)
+			self.entry_thermostat_extension.bind('<FocusOut>', self.callback_thermocycler_temperatures)
 			self.entry_thermostat_extension.place(x=225, y=365)
 			self.label_units_denature_C = ctk.CTkLabel(master=self.frame_right, text='C', font=("Roboto Light",-16))
 			self.label_units_anneal_C = ctk.CTkLabel(master=self.frame_right, text='C', font=("Roboto Light",-16))
@@ -149,11 +169,17 @@ class App(ctk.CTk):
 			self.img_clock = ImageTk.PhotoImage(image)
 			self.label_clock = ctk.CTkLabel(master=self.frame_right, text='', bg_color='white', image=self.img_clock)
 			self.label_clock.place(x=15, y=395)
-			self.entry_clock_denature = ctk.CTkEntry(master=self.frame_right, width=40)
+			clock_denature_sv = StringVar()
+			clock_denature_sv.set(str(self.thermocyclers['times'][thermocycler]['denature']))
+			self.entry_clock_denature = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=clock_denature_sv)
 			self.entry_clock_denature.place(x=65, y=395)
-			self.entry_clock_anneal = ctk.CTkEntry(master=self.frame_right, width=40)
+			clock_anneal_sv = StringVar()
+			clock_anneal_sv.set(str(self.thermocyclers['times'][thermocycler]['anneal']))
+			self.entry_clock_anneal = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=clock_anneal_sv)
 			self.entry_clock_anneal.place(x=145, y=395)
-			self.entry_clock_extension = ctk.CTkEntry(master=self.frame_right, width=40)
+			clock_extension_sv = StringVar()
+			clock_extension_sv.set(str(self.thermocyclers['times'][thermocycler]['extension']))
+			self.entry_clock_extension = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=clock_extension_sv)
 			self.entry_clock_extension.place(x=225, y=395)
 			self.label_units_denature_time = ctk.CTkLabel(master=self.frame_right, text='min', font=("Roboto Light",-16))
 			self.label_units_anneal_time = ctk.CTkLabel(master=self.frame_right, text='sec', font=("Roboto Light",-16))
@@ -206,14 +232,16 @@ class App(ctk.CTk):
 	def plot_thermocycler(self, data) -> None:
 		fig = Figure(figsize=(3,2.4))
 		a = fig.add_subplot(111)
-		data = np.array([92,92,55,55,84,84])
+		#data = np.array([92,92,55,55,84,84])
 		x = np.array([1,2,3,4,5,6])
+		print(f"{data[0]}")
 		a.set_yticks([data[0],data[2],data[4]])
 		a.set_xticks([])
 		a.axvline(x=2.5)
 		a.axvline(x=4.5)
 		a.plot(x, data, color='red')
 		canvas = FigureCanvasTkAgg(fig, master=self.frame_right)
+		canvas.flush_events()
 		canvas.get_tk_widget().place(x=10, y=120)
 		canvas.draw()
 		#self.plot_thermocycler(self.thermocycler['temperatures']['A'])
@@ -231,22 +259,62 @@ class App(ctk.CTk):
 			# Get label text.
 			label_text = event.widget.cget('text')
 			if label_text == 'thermocycler':
-				# Check what the user is hovering over.
+				# Check what the user is hovering over and toggle the component on click.
 				if x >= 130 and x <= 238:
 					if y >= 30 and y <= 124:
-						# Toggle the heater if possible.
-						print('A')
+						clicked_on = 'A'
+						self.thermocyclers['clamps']['A']['homed'] = not self.thermocyclers['clamps']['A']['homed']
 					elif y >= 128 and y <= 222:
-						print('B')
+						clicked_on = 'B'
+						self.thermocyclers['clamps']['B']['homed'] = not self.thermocyclers['clamps']['B']['homed']
 					elif y >= 248 and y <= 345:
-						print('C')
+						clicked_on = 'C'
+						self.thermocyclers['clamps']['C']['homed'] = not self.thermocyclers['clamps']['C']['homed']
 					elif y >= 348 and y <= 446:
-						print('D')
+						clicked_on = 'D'
+						self.thermocyclers['clamps']['D']['homed'] = not self.thermocyclers['clamps']['D']['homed']
 				elif x >= 7	and x <= 118:
 					if y >= 8 and y <= 234:
-						print('AB')
+						clicked_on = 'AB'
+						if self.thermocyclers['clamps']['A']['homed'] and self.thermocyclers['clamps']['B']['homed']:
+							self.thermocyclers['trays']['AB']['homed'] = not self.thermocyclers['trays']['AB']['homed']
 					elif y >= 238 and y <= 464:
-						print('CD')
+						clicked_on = 'CD'
+						if self.thermocyclers['clamps']['C']['homed'] and self.thermocyclers['clamps']['D']['homed']:
+							self.thermocyclers['trays']['CD']['homed'] = not self.thermocyclers['trays']['CD']['homed']
+				# Change the thermocycler picture.
+				thermocycler_dict = {
+						'A': self.thermocyclers['clamps']['A']['homed'],
+						'B': self.thermocyclers['clamps']['B']['homed'],
+						'C': self.thermocyclers['clamps']['C']['homed'],
+						'D': self.thermocyclers['clamps']['D']['homed'],
+						'AB': self.thermocyclers['trays']['AB']['homed'],
+						'CD': self.thermocyclers['trays']['CD']['homed'],
+					}						
+				png_name = self.make_thermocycler_png_name(thermocycler_dict)
+				image = Image.open(png_name).resize((250, 470))
+				self.img_thermocycler = ImageTk.PhotoImage(image)
+				self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='thermocycler', font=("Roboto Light", -1), image=self.img_thermocycler)
+				self.label_thermocycler.place(x=310, y=5) 
+				self.label_thermocycler.bind('<Button-1>', self.on_click)
+
+	def make_thermocycler_png_name(self, thermocycler_dict) -> str:
+		d = thermocycler_dict
+		s = 'thermocycler'
+		if not d['AB']:
+			s = s + '_ab'
+		if not d['CD']:
+			s = s + '_cd'
+		if not d['A']:
+			s = s + '_a'
+		if not d['B']:
+			s = s + '_b'
+		if not d['C']:
+			s = s + '_c'
+		if not d['D']:
+			s = s + '_d'
+		s = s + '.png'
+		return s
 
 	def motion(self, event) -> None:
 		x,y = event.x, event.y
@@ -254,11 +322,20 @@ class App(ctk.CTk):
 
 	def callback_denature_temperature(self, sv):
 		print(sv.get())
-		thermocycler = self.optionmenu_thermocycler.cget('variable').get()
+		#thermocycler = self.optionmenu_thermocycler.cget('variable').get()
 		# Update the data.
-		self.thermocyclers['temperatures'][thermocycler] = np.array([90,90,40,40,80,80])
+		#self.thermocyclers['temperatures'][thermocycler] = np.array([90,90,40,40,80,80])
+		#self.plot_thermocycler(self.thermocyclers['temperatures'][thermocycler])
+
+	def callback_thermocycler_temperatures(self, event):
+		thermocycler = self.optionmenu_thermocycler.cget('variable').get()
+		# Update the data in the Thermocycler plot.
+		temp_denature = int(self.entry_thermostat_denature.get())
+		temp_anneal = int(self.entry_thermostat_anneal.get())
+		temp_extension = int(self.entry_thermostat_extension.get())
+		self.thermocyclers['temperatures'][thermocycler] = np.array([temp_denature,temp_denature, temp_anneal,temp_anneal, temp_extension, temp_extension])
+		print(self.thermocyclers['temperatures'][thermocycler])
 		self.plot_thermocycler(self.thermocyclers['temperatures'][thermocycler])
-		print('here')
 
 	def callback_anneal_temperature(self, sv):
 		print(sv.get())
@@ -268,21 +345,14 @@ class App(ctk.CTk):
 
 	def enter(self, event):
 		# Get the entry name.
-		#print(dir(event.widget))
-		#print(event.widget.winfo_name)
-		print(event.widget.winfo_pathname)
+		a = 1
 
 	def on_closing(self, event=0) -> None:
 		self.destroy()
 
-def motion(event):
-	x, y = event.x, event.y
-	print(f"{x}, {y}")
-
 if __name__ == '__main__':
 	app = App()
 	app.iconbitmap('bio-rad-logo.ico')
-	#app.bind('<Motion>', motion)
 	app.bind('<Return>', app.enter)
 	app.maxsize(780,520)
 	app.minsize(780,520)
