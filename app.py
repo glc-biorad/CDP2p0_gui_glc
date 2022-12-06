@@ -292,6 +292,7 @@ class App(ctk.CTk):
 						'CD': self.thermocyclers['trays']['CD']['homed'],
 					}						
 				png_name = self.make_thermocycler_png_name(thermocycler_dict)
+				print(png_name)
 				image = Image.open(png_name).resize((250, 470))
 				self.img_thermocycler = ImageTk.PhotoImage(image)
 				self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='thermocycler', font=("Roboto Light", -1), image=self.img_thermocycler)
