@@ -1,5 +1,10 @@
 #!/usr/bin/env python3.8
 
+import os
+import getpass
+import datetime
+import time
+#import fpdf
 from tkinter import StringVar
 import tkinter
 import customtkinter as ctk
@@ -19,13 +24,13 @@ class App(ctk.CTk):
 
 	# Thermocycler Settings:
 	thermocyclers = {
-		'clamp': {
+		'clamps': {
 			'A': True, # True (Raised, homed), False (Lowered)
 			'B': True,
 			'C': True,
 			'D': True,
 			},
-		'tray': {
+		'trays': {
 			'AB': True, # True (Open, homed), False (Closed),
 			'CD': True, # True (Open, homed), False (Closed),
 			},
@@ -51,7 +56,22 @@ class App(ctk.CTk):
 			'C': {'homed': True},
 			'D': {'homed': True},
 			},
+		'cycles': {
+			'A': 45,
+			'B': 45,
+			'C': 45,
+			'D': 45,
+			},
 		}
+	thermocycler_dict = {
+			'A': True,
+			'B': True,
+			'C': True,
+			'D': True,
+			'AB': True,
+			'CD': True,
+		}						
+	thermocycler_png_name = 'thermocycler.png'
 
 	def __init__(self):
 		super().__init__()
@@ -103,22 +123,26 @@ class App(ctk.CTk):
 			self.label_thermocycler.place(x=0, y=40)
 			thermocycler_options = StringVar()
 			thermocycler_options.set('A')
-			self.optionmenu_thermocycler = ctk.CTkOptionMenu(master=self.frame_right, variable=thermocycler_options, values=('A', 'B', 'C', 'D'))
+			self.optionmenu_thermocycler = ctk.CTkOptionMenu(master=self.frame_right, variable=thermocycler_options, values=('A', 'B', 'C', 'D'), command=self.callback_update_thermocycler_protocol)
+			thermocycler = str(self.optionmenu_thermocycler.cget('variable').get())
 			self.optionmenu_thermocycler.place(x=150, y=40)
 			self.label_thermocycler_cycles = ctk.CTkLabel(master=self.frame_right, text='Cycles', font=("Roboto Light", -16))
 			self.label_thermocycler_cycles.place(x=0, y=80)
-			self.entry_thermocycler_cycles = ctk.CTkEntry(master=self.frame_right)
+			thermocycler_cycles_sv = StringVar()
+			thermocycler_cycles_sv.set(str(self.thermocyclers['cycles'][thermocycler]))
+			self.entry_thermocycler_cycles = ctk.CTkEntry(master=self.frame_right, textvariable=thermocycler_cycles_sv)
+			self.entry_thermocycler_cycles.bind('<FocusOut>', self.callback_thermocycler_cycles)
 			self.entry_thermocycler_cycles.place(x=150, y=80)
-			image = Image.open('thermocycler.png').resize((250, 470))
+			image = Image.open(self.thermocycler_png_name).resize((250, 470))
 			self.img_thermocycler = ImageTk.PhotoImage(image)
 			self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='thermocycler', font=("Roboto Light", -1), image=self.img_thermocycler)
 			self.label_thermocycler.place(x=310, y=5) 
 			self.label_thermocycler.bind('<Button-1>', self.on_click)
-			self.button_start_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Start', command=self.start_thermocyclers())
+			self.button_start_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Start', command=self.start_thermocyclers)
 			self.button_start_thermocyclers.place(x=5, y=445, width=100)
-			self.button_import = ctk.CTkButton(master=self.frame_right, text='Import', command=self.import_thermocyclers())
+			self.button_import = ctk.CTkButton(master=self.frame_right, text='Import', command=self.import_thermocyclers)
 			self.button_import.place(x=115, y=445, width=95)
-			self.button_export = ctk.CTkButton(master=self.frame_right, text='Export', command=self.export_thermocyclers())
+			self.button_export = ctk.CTkButton(master=self.frame_right, text='Export', command=self.export_thermocyclers)
 			self.button_export.place(x=215, y=445, width=95) 
 			#fig = Figure(figsize=(3,2.4))
 			#a = fig.add_subplot(111)
@@ -172,14 +196,17 @@ class App(ctk.CTk):
 			clock_denature_sv = StringVar()
 			clock_denature_sv.set(str(self.thermocyclers['times'][thermocycler]['denature']))
 			self.entry_clock_denature = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=clock_denature_sv)
+			self.entry_clock_denature.bind('<FocusOut>', self.callback_thermocycler_times)
 			self.entry_clock_denature.place(x=65, y=395)
 			clock_anneal_sv = StringVar()
 			clock_anneal_sv.set(str(self.thermocyclers['times'][thermocycler]['anneal']))
 			self.entry_clock_anneal = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=clock_anneal_sv)
+			self.entry_clock_anneal.bind('<FocusOut>', self.callback_thermocycler_times)
 			self.entry_clock_anneal.place(x=145, y=395)
 			clock_extension_sv = StringVar()
 			clock_extension_sv.set(str(self.thermocyclers['times'][thermocycler]['extension']))
 			self.entry_clock_extension = ctk.CTkEntry(master=self.frame_right, width=40, textvariable=clock_extension_sv)
+			self.entry_clock_extension.bind('<FocusOut>', self.callback_thermocycler_times)
 			self.entry_clock_extension.place(x=225, y=395)
 			self.label_units_denature_time = ctk.CTkLabel(master=self.frame_right, text='min', font=("Roboto Light",-16))
 			self.label_units_anneal_time = ctk.CTkLabel(master=self.frame_right, text='sec', font=("Roboto Light",-16))
@@ -193,13 +220,16 @@ class App(ctk.CTk):
 		elif button_text == 'Optimize':
 			image = Image.open('deck_plate.png').resize((560, 430))
 			self.img_deck_plate = ImageTk.PhotoImage(image)
-			self.label_deck_plate = ctk.CTkLabel(master=self.frame_right, text='', image=self.img_deck_plate)
+			self.label_deck_plate = ctk.CTkLabel(master=self.frame_right, text='deck_plate', font=("Roboto Medium", -1), image=self.img_deck_plate)
+			self.label_deck_plate.bind('<ButtonPress-1>', self.on_click)
+			self.label_deck_plate.bind('<ButtonRelease-1>', self.on_release)
+			self.label_deck_plate.bind('<MouseWheel>', self.mouse_wheel)
 			self.label_deck_plate.place(x=0, y=40) 
 			self.label_consumable = ctk.CTkLabel(master=self.frame_right, text='Consumable', font=("Roboto Medium", -16))
 			self.label_consumable.place(x=5, y=5, width=90)
 			consumable_options = StringVar()
 			consumable_options.set('')
-			self.optionmenu_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=consumable_options, values=("Tip Tray", "Reagent Cartridge", "Sample Rack", "Aux Heater", "Heater/Shaker", "Mag Separator", "Chiller", "Pre-Amp Thermocycler", "Lid Tray", "Tip Transfer Tray", "DNA Quant", "Assay Strip"))
+			self.optionmenu_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=consumable_options, values=("Tip Tray", "Reagent Cartridge", "Sample Rack", "Aux Heater", "Heater/Shaker", "Mag Separator", "Chiller", "Pre-Amp Thermocycler", "Lid Tray", "Tip Transfer Tray", "Quant Strip", "Assay Strip"))
 			self.optionmenu_consumable.place(x=100, y=5, width=190)
 			self.label_tray = ctk.CTkLabel(master=self.frame_right, text='Tray', font=("Roboto Medium", -16))
 			self.label_tray.place(x=295, y=5, width=40)
@@ -213,7 +243,7 @@ class App(ctk.CTk):
 			column_options.set('')
 			self.optionmenu_column = ctk.CTkOptionMenu(master=self.frame_right, variable=column_options, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'))
 			self.optionmenu_column.place(x=480, y=5, width=60)
-			self.label_x = ctk.CTkLabel(master=self.frame_right, text='X', font=("Roboto Medium", -16))
+			self.label_x = ctk.CTkLabel(master=self.frame_right, text='X', font=("Roboto Medium", 8))
 			self.label_x.place(x=195, y=45, width=30)
 		elif button_text == 'Service':
 			self.label_service_1 = ctk.CTkLabel(master=self.frame_right, text='Service', font=("Roboto Medium", -16))
@@ -221,20 +251,115 @@ class App(ctk.CTk):
 		#self.update()
 
 	def start_thermocyclers(self) -> None:
-		print("HERE")
+		# Create a file for logging.
+		file = self.browse_files()
+		file.write(f"""------------------------------------------------------
+Thermocycler Protocol
+------------------------------------------------------
+Date: {datetime.date.today()}
+User: {getpass.getuser()}
+
+Thermocycler A:
+---------------
+Cycles: {int(self.thermocyclers['cycles']['A'])}
+Temperatures:
+	Denature: {int(self.thermocyclers['temperatures']['A'][0])} C
+	Anneal: {int(self.thermocyclers['temperatures']['A'][2])} C
+	Extension: {int(self.thermocyclers['temperatures']['A'][4])} C
+Times:
+	Denature: {int(self.thermocyclers['times']['A']['denature'])} min
+	Anneal: {int(self.thermocyclers['times']['A']['anneal'])} sec
+	Extension: {int(self.thermocyclers['times']['A']['extension'])} sec
+
+Thermocycler B:
+---------------
+Cycles: {int(self.thermocyclers['cycles']['B'])}
+Temperatures:
+	Denature: {int(self.thermocyclers['temperatures']['B'][0])} C
+	Anneal: {int(self.thermocyclers['temperatures']['B'][2])} C
+	Extension: {int(self.thermocyclers['temperatures']['B'][4])} C
+Times:
+	Denature: {int(self.thermocyclers['times']['B']['denature'])} min
+	Anneal: {int(self.thermocyclers['times']['B']['anneal'])} sec
+	Extension: {int(self.thermocyclers['times']['B']['extension'])} sec
+
+Thermocycler C:
+---------------
+Cycles: {int(self.thermocyclers['cycles']['C'])}
+Temperatures:
+	Denature: {int(self.thermocyclers['temperatures']['C'][0])} C
+	Anneal: {int(self.thermocyclers['temperatures']['C'][2])} C
+	Extension: {int(self.thermocyclers['temperatures']['C'][4])} C
+Times:
+	Denature: {int(self.thermocyclers['times']['C']['denature'])} min
+	Anneal: {int(self.thermocyclers['times']['C']['anneal'])} sec
+	Extension: {int(self.thermocyclers['times']['C']['extension'])} sec
+
+Thermocycler D:
+---------------
+Cycles: {int(self.thermocyclers['cycles']['D'])}
+Temperatures:
+	Denature: {int(self.thermocyclers['temperatures']['D'][0])} C
+	Anneal: {int(self.thermocyclers['temperatures']['D'][2])} C
+	Extension: {int(self.thermocyclers['temperatures']['D'][4])} C
+Times:
+	Denature: {int(self.thermocyclers['times']['D']['denature'])} min
+	Anneal: {int(self.thermocyclers['times']['D']['anneal'])} sec
+	Extension: {int(self.thermocyclers['times']['D']['extension'])} sec
+
+------------------------------------------------------""")
+		# Start timers for the thermocyclers
+		# Get the number of cycles for each thermocycler
+		cycles_A = int(self.thermocyclers['cycles']['A'])
+		cycles_B = int(self.thermocyclers['cycles']['B'])
+		cycles_C = int(self.thermocyclers['cycles']['C'])
+		cycles_D = int(self.thermocyclers['cycles']['D'])
+		# Get the times for each thermocycler
+		denature_time_A = int(self.thermocyclers['times']['A']['denature'])
+		denature_time_B = int(self.thermocyclers['times']['B']['denature'])
+		denature_time_C = int(self.thermocyclers['times']['C']['denature'])
+		denature_time_D = int(self.thermocyclers['times']['D']['denature'])
+		anneal_time_A = int(self.thermocyclers['times']['A']['anneal'])
+		anneal_time_B = int(self.thermocyclers['times']['B']['anneal'])
+		anneal_time_C = int(self.thermocyclers['times']['C']['anneal'])
+		anneal_time_D = int(self.thermocyclers['times']['D']['anneal'])
+		extension_time_A = int(self.thermocyclers['times']['A']['extension'])
+		extension_time_B = int(self.thermocyclers['times']['B']['extension'])
+		extension_time_C = int(self.thermocyclers['times']['C']['extension'])
+		extension_time_D = int(self.thermocyclers['times']['D']['extension'])
+		# Get the temperatures for each thermocycler
+		denature_temperature_A = int(self.thermocyclers['temperatures']['A'][0])
+		denature_temperature_B = int(self.thermocyclers['temperatures']['B'][0])
+		denature_temperature_C = int(self.thermocyclers['temperatures']['C'][0])
+		denature_temperature_D = int(self.thermocyclers['temperatures']['D'][0])
+		anneal_temperature_A = int(self.thermocyclers['temperatures']['A'][2])
+		anneal_temperature_B = int(self.thermocyclers['temperatures']['B'][2])
+		anneal_temperature_C = int(self.thermocyclers['temperatures']['C'][2])
+		anneal_temperature_D = int(self.thermocyclers['temperatures']['D'][2])
+		extension_temperature_A = int(self.thermocyclers['temperatures']['A'][4])
+		extension_temperature_B = int(self.thermocyclers['temperatures']['B'][4])
+		extension_temperature_C = int(self.thermocyclers['temperatures']['C'][4])
+		extension_temperature_D = int(self.thermocyclers['temperatures']['D'][4])
+		# Denature
+		time_start = time.time()
+		# Thermocycle
+		# End temperatue
+	
+	def browse_files(self):
+		file = tkinter.filedialog.asksaveasfile(initialfile='thermocycler_protocol.txt', initialdir = './', title="Save Protocol to File")
+		return file
 
 	def import_thermocyclers(self) -> None:
-		print("HERE")
+		a = 1
 
 	def export_thermocyclers(self) -> None:
-		print("HERE")
+		a = 1
 
 	def plot_thermocycler(self, data) -> None:
 		fig = Figure(figsize=(3,2.4))
 		a = fig.add_subplot(111)
 		#data = np.array([92,92,55,55,84,84])
 		x = np.array([1,2,3,4,5,6])
-		print(f"{data[0]}")
 		a.set_yticks([data[0],data[2],data[4]])
 		a.set_xticks([])
 		a.axvline(x=2.5)
@@ -283,7 +408,7 @@ class App(ctk.CTk):
 						if self.thermocyclers['clamps']['C']['homed'] and self.thermocyclers['clamps']['D']['homed']:
 							self.thermocyclers['trays']['CD']['homed'] = not self.thermocyclers['trays']['CD']['homed']
 				# Change the thermocycler picture.
-				thermocycler_dict = {
+				self.thermocycler_dict = {
 						'A': self.thermocyclers['clamps']['A']['homed'],
 						'B': self.thermocyclers['clamps']['B']['homed'],
 						'C': self.thermocyclers['clamps']['C']['homed'],
@@ -291,16 +416,239 @@ class App(ctk.CTk):
 						'AB': self.thermocyclers['trays']['AB']['homed'],
 						'CD': self.thermocyclers['trays']['CD']['homed'],
 					}						
-				png_name = self.make_thermocycler_png_name(thermocycler_dict)
-				print(png_name)
-				image = Image.open(png_name).resize((250, 470))
+				self.make_thermocycler_png_name()
+				image = Image.open(self.thermocycler_png_name).resize((250, 470))
 				self.img_thermocycler = ImageTk.PhotoImage(image)
 				self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='thermocycler', font=("Roboto Light", -1), image=self.img_thermocycler)
 				self.label_thermocycler.place(x=310, y=5) 
 				self.label_thermocycler.bind('<Button-1>', self.on_click)
+			if label_text == 'deck_plate':
+				print(f"Clicked: {x}, {y}")
+				consumable_options = StringVar()
+				tray_options = StringVar()
+				column_options = StringVar()
+				# Quant Strips
+				if x >= 531 and x <= 553:
+					consumable_options.set('Quant Strip')
+					column_options.set('1')
+					if y >= 62 and y <= 148:
+						tray_options.set('A')
+					elif y >= 154 and y <= 241: 
+						tray_options.set('B')
+					elif y >= 247 and y <= 334:
+						tray_options.set('C')
+					elif y >= 338 and y <= 425:
+						tray_options.set('D')
+				# Tip Trays
+				if x >= 433 and x <= 440:
+					consumable_options.set('Tip Tray')
+					column_options.set('1')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 441 and x <= 448:
+					consumable_options.set('Tip Tray')
+					column_options.set('2')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 442 and x <= 455:
+					consumable_options.set('Tip Tray')
+					column_options.set('3')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 456 and x <= 464:
+					consumable_options.set('Tip Tray')
+					column_options.set('4')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 465 and x <= 472:
+					consumable_options.set('Tip Tray')
+					column_options.set('5')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 473 and x <= 479:
+					consumable_options.set('Tip Tray')
+					column_options.set('6')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 480 and x <= 486:
+					consumable_options.set('Tip Tray')
+					column_options.set('7')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 487 and x <= 495:
+					consumable_options.set('Tip Tray')
+					column_options.set('8')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 496 and x <= 503:
+					consumable_options.set('Tip Tray')
+					column_options.set('9')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 504 and x <= 510:
+					consumable_options.set('Tip Tray')
+					column_options.set('10')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 511 and x <= 516:
+					consumable_options.set('Tip Tray')
+					column_options.set('11')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				elif x >= 517 and x <= 527:
+					consumable_options.set('Tip Tray')
+					column_options.set('12')
+					if y >= 64 and y <= 150:
+						tray_options.set('A')
+					elif y >= 156 and y <= 241:
+						tray_options.set('B')
+					elif y >= 249 and y <= 334:
+						tray_options.set('C')
+					elif y >= 340 and y <= 426:
+						tray_options.set('D')
+				# Reagent Cartridge
+				# Sample Rack
+				if x >= 266 and x <= 298:
+					consumable_options.set('Sample Rack')
+					column_options.set('1')
+					if y >= 62 and y <= 150:
+						tray_options.set('A')
+					elif y >= 154 and y <= 243: 
+						tray_options.set('B')
+					elif y >= 247 and y <= 334:
+						tray_options.set('C')
+					elif y >= 338 and y <= 427:
+						tray_options.set('D')
+				# Aux Heater
+				if x >= 232 and x <= 258:
+					consumable_options.set('Aux Heater')
+					column_options.set('1')
+					if y >= 62 and y <= 150:
+						tray_options.set('A')
+					elif y >= 154 and y <= 243: 
+						tray_options.set('B')
+					elif y >= 247 and y <= 334:
+						tray_options.set('C')
+					elif y >= 338 and y <= 427:
+						tray_options.set('D')
+				# Heater/Shaker
+				if x >= 113 and x <= 225 and y >= 157 and y <= 242:
+					consumable_options.set('Heater/Shaker')
+					tray_options.set('')
+					if x >= 113 and x <= 138:
+						column_options.set('1')
+					elif x >= 144 and x <= 167:
+						column_options.set('2')
+					elif x >= 173 and x <= 195:
+						column_options.set('3')
+					elif x >= 199 and x <= 221:
+						column_options.set('4')
+				# Mag Separator
+				if x >= 111 and x <= 224 and y >= 249 and y <= 333:
+					consumable_options.set("Mag Separator")
+					tray_options.set('')
+					if x >= 111 and x <= 121:
+						column_options.set('1')
+					elif x >= 122 and x <= 130:
+						column_options.set('2')
+					elif x >= 131 and x <= 140:
+						column_options.set('3')
+					elif x >= 141 and x <= 148:
+						column_options.set('4')
+					elif x >= 149 and x <= 158:
+						column_options.set('5')
+					elif x >= 159 and x <= 167:
+						column_options.set('6')
+					elif x >= 168 and x <= 176:
+						column_options.set('7')
+					elif x >= 177 and x <= 186:
+						column_options.set('8')
+				# Chiller
+				# Pre-Amp Thermocycler
+				# Lid Tray
+				# Tip Transfer Tray
+				# Assay Strip
+				# Update the option menus
+				self.optionmenu_consumable.configure(variable=consumable_options)
+				self.optionmenu_tray.configure(variable=tray_options)
+				self.optionmenu_column.configure(variable=column_options)
 
-	def make_thermocycler_png_name(self, thermocycler_dict) -> str:
-		d = thermocycler_dict
+	def on_release(self, event):
+		x, y = event.x, event.y
+		if type(event.widget) == tkinter.Label:
+			# Get label text.
+			label_text = event.widget.cget('text')
+			if label_text == 'deck_plate':
+				print(f"Released: {x}, {y}")
+
+	def make_thermocycler_png_name(self) -> None:
+		d = self.thermocycler_dict
 		s = 'thermocycler'
 		if not d['AB']:
 			s = s + '_ab'
@@ -315,18 +663,37 @@ class App(ctk.CTk):
 		if not d['D']:
 			s = s + '_d'
 		s = s + '.png'
-		return s
+		self.thermocycler_png_name = s
 
 	def motion(self, event) -> None:
 		x,y = event.x, event.y
 		#print(f"{x}, {y}")
 
-	def callback_denature_temperature(self, sv):
-		print(sv.get())
-		#thermocycler = self.optionmenu_thermocycler.cget('variable').get()
-		# Update the data.
-		#self.thermocyclers['temperatures'][thermocycler] = np.array([90,90,40,40,80,80])
-		#self.plot_thermocycler(self.thermocyclers['temperatures'][thermocycler])
+	def callback_update_thermocycler_protocol(self, event):
+		# Fill in all the protocol data for the heater.
+		thermocycler = self.optionmenu_thermocycler.get()
+		thermocycler_cycles_sv = StringVar()
+		thermocycler_cycles_sv.set(str(self.thermocyclers['cycles'][thermocycler]))
+		self.entry_thermocycler_cycles.configure(textvariable=thermocycler_cycles_sv)
+		thermostat_denature_sv = StringVar()
+		thermostat_denature_sv.set(str(self.thermocyclers['temperatures'][thermocycler][0]))
+		self.entry_thermostat_denature.configure(textvariable=thermostat_denature_sv)
+		thermostat_anneal_sv = StringVar()
+		thermostat_anneal_sv.set(str(self.thermocyclers['temperatures'][thermocycler][2]))
+		self.entry_thermostat_anneal.configure(textvariable=thermostat_anneal_sv)
+		thermostat_extension_sv = StringVar()
+		thermostat_extension_sv.set(str(self.thermocyclers['temperatures'][thermocycler][4]))
+		self.entry_thermostat_extension.configure(textvariable=thermostat_extension_sv)
+		clock_denature_sv = StringVar()
+		clock_denature_sv.set(str(self.thermocyclers['times'][thermocycler]['denature']))
+		self.entry_clock_denature.configure(textvariable=clock_denature_sv)
+		clock_anneal_sv = StringVar()
+		clock_anneal_sv.set(str(self.thermocyclers['times'][thermocycler]['anneal']))
+		self.entry_clock_anneal.configure(textvariable=clock_anneal_sv)
+		clock_extension_sv = StringVar()
+		clock_extension_sv.set(str(self.thermocyclers['times'][thermocycler]['extension']))
+		self.entry_clock_extension.configure(textvariable=clock_extension_sv)
+		self.plot_thermocycler(self.thermocyclers['temperatures'][thermocycler])
 
 	def callback_thermocycler_temperatures(self, event):
 		thermocycler = self.optionmenu_thermocycler.cget('variable').get()
@@ -335,18 +702,33 @@ class App(ctk.CTk):
 		temp_anneal = int(self.entry_thermostat_anneal.get())
 		temp_extension = int(self.entry_thermostat_extension.get())
 		self.thermocyclers['temperatures'][thermocycler] = np.array([temp_denature,temp_denature, temp_anneal,temp_anneal, temp_extension, temp_extension])
-		print(self.thermocyclers['temperatures'][thermocycler])
 		self.plot_thermocycler(self.thermocyclers['temperatures'][thermocycler])
 
-	def callback_anneal_temperature(self, sv):
-		print(sv.get())
+	def callback_thermocycler_times(self, event):
+		thermocycler = self.optionmenu_thermocycler.cget('variable').get()
+		time_denature = int(self.entry_clock_denature.get())
+		time_anneal = int(self.entry_clock_anneal.get())
+		time_extension = int(self.entry_clock_extension.get())
+		self.thermocyclers['times'][thermocycler]['denature'] = time_denature
+		self.thermocyclers['times'][thermocycler]['anneal'] = time_anneal
+		self.thermocyclers['times'][thermocycler]['extension'] = time_extension
 
-	def callback_extension_temperature(self, sv):
-		print(sv.get())
+	def callback_thermocycler_cycles(self, event):
+		thermocycler = self.optionmenu_thermocycler.cget('variable').get()
+		cycles = int(self.entry_thermocycler_cycles.get())
+		self.thermocyclers['cycles'][thermocycler] = cycles
 
 	def enter(self, event):
 		# Get the entry name.
 		a = 1
+
+	def mouse_wheel(self, event):
+		if type(event.widget) == tkinter.Label:
+			label_text = event.widget.cget('text')
+			if event.delta == 1:
+				print(f"{label_text}: down")
+			elif event.delta == -1:
+				print(f"{label_text}: up")
 
 	def on_closing(self, event=0) -> None:
 		self.destroy()
