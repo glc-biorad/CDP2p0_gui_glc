@@ -75,6 +75,18 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
+		self.use_z = tkinter.IntVar()
+		self.use_z.set(1)
+		self.slow_z = tkinter.IntVar()
+		self.slow_z.set(1)
+		self.pipette_tip_type = StringVar()
+		self.pipette_tip_type.set('')
+		self.dx = StringVar()
+		self.dx.set('500')
+		self.dy = StringVar()
+		self.dy.set('5000')
+		self.dz = StringVar()
+		self.dz.set('5000')
 		self.bind('<Motion>', self.motion)
 		
 		self.title("CDP 2.0 GUI")
@@ -89,7 +101,7 @@ class App(ctk.CTk):
 		self.frame_left.grid(row=0, column=0, sticky='nswe')
 
 		self.frame_right = ctk.CTkFrame(master=self)
-		self.frame_right.grid(row=0, column=1, sticky='nswe', padx=20, pady=20, columnspan=3)
+		self.frame_right.grid(row=0, column=1, sticky='nswe', padx=20, pady=10, columnspan=3)
 
 		# Left Frame.
 		self.label_1 = ctk.CTkLabel(master=self.frame_left, text="CDP 2.0", font=("Roboto Medium", -16))
@@ -225,6 +237,21 @@ class App(ctk.CTk):
 			self.label_deck_plate.bind('<ButtonRelease-1>', self.on_release)
 			self.label_deck_plate.bind('<MouseWheel>', self.mouse_wheel)
 			self.label_deck_plate.place(x=0, y=40) 
+			self.label_dx = ctk.CTkLabel(master=self.frame_right, text='dx', font=("Roboto Medium", -10))
+			self.label_dx.place(x=195, y=35)
+			self.entry_dx = ctk.CTkEntry(master=self.frame_right, width=70, textvariable=self.dx, font=("Roboto Medium", -10), height=10) 
+			self.entry_dx.bind('<FocusOut>', self.callback_dx)
+			self.entry_dx.place(x=220, y=40)
+			self.label_dy = ctk.CTkLabel(master=self.frame_right, text='dy', font=("Roboto Medium", -10))
+			self.label_dy.place(x=195, y=55)
+			self.entry_dy = ctk.CTkEntry(master=self.frame_right, width=70, textvariable=self.dy, font=("Roboto Medium", -10), height=10) 
+			self.entry_dy.bind('<FocusOut>', self.callback_dy)
+			self.entry_dy.place(x=220, y=60)
+			self.label_dz = ctk.CTkLabel(master=self.frame_right, text='dz', font=("Roboto Medium", -10))
+			self.label_dz.place(x=195, y=75)
+			self.entry_dz = ctk.CTkEntry(master=self.frame_right, width=70, textvariable=self.dz, font=("Roboto Medium", -10), height=10) 
+			self.entry_dz.bind('<FocusOut>', self.callback_dz)
+			self.entry_dz.place(x=220, y=80)
 			self.label_consumable = ctk.CTkLabel(master=self.frame_right, text='Consumable', font=("Roboto Medium", -16))
 			self.label_consumable.place(x=5, y=5, width=90)
 			consumable_options = StringVar()
@@ -243,12 +270,37 @@ class App(ctk.CTk):
 			column_options.set('')
 			self.optionmenu_column = ctk.CTkOptionMenu(master=self.frame_right, variable=column_options, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'))
 			self.optionmenu_column.place(x=480, y=5, width=60)
-			self.label_x = ctk.CTkLabel(master=self.frame_right, text='X', font=("Roboto Medium", 8))
-			self.label_x.place(x=195, y=45, width=30)
+			self.label_tip = ctk.CTkLabel(master=self.frame_right, text='Tip Size (uL)', font=("Roboto Medium", -16))
+			self.label_tip.place(x=330, y=470)
+			self.optionmenu_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.pipette_tip_type, values=('1000', '50', '200', ''))
+			self.optionmenu_tip.place(x=435, y=470, width=100)
+			self.checkbox_use_z = ctk.CTkCheckBox(master=self.frame_right, text="Use Z", variable=self.use_z, onvalue=1, offvalue=0) 
+			self.checkbox_use_z.place(x=330, y=40, width=100)
+			self.checkbox_slow_z = ctk.CTkCheckBox(master=self.frame_right, text="Slow Z", variable=self.slow_z, onvalue=1, offvalue=0)
+			self.checkbox_slow_z.place(x=330, y=70, width=100)
+			self.button_print = ctk.CTkButton(master=self.frame_right, text='Print', font=("Roboto Medium", -16), width=60, command=self.print_coordinate, height=45)
+			self.button_print.place(x=410, y=45)
+			self.button_update = ctk.CTkButton(master=self.frame_right, text='Update', font=("Roboto Medium", -16), width=60, command=self.update_coordinate, height=45, fg_color='#4C7BD3') 
+			self.button_update.place(x=480, y=45)
 		elif button_text == 'Service':
 			self.label_service_1 = ctk.CTkLabel(master=self.frame_right, text='Service', font=("Roboto Medium", -16))
 			self.label_service_1.grid(row=1, column=0, pady=10, padx=10)
 		#self.update()
+
+	def update_coordinate(self):
+		print("Update Coordinate")
+
+	def print_coordinate(self):
+		print("Print Coordinate")
+
+	def callback_dx(self, event):
+		self.dx = self.entry_dx.get()
+
+	def callback_dy(self, event):
+		self.dy = self.entry_dy.get()
+
+	def callback_dz(self, event):
+		self.dz = self.entry_dz.get()
 
 	def start_thermocyclers(self) -> None:
 		# Create a file for logging.
