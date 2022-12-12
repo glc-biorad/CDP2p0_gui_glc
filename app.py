@@ -87,7 +87,10 @@ class App(ctk.CTk):
 		self.dy.set('5000')
 		self.dz = StringVar()
 		self.dz.set('5000')
+		self.build_protocol_tips_tray_sv = StringVar('')
 		self.bind('<Motion>', self.motion)
+
+		self.build_protocol_treeview_row_index = 0
 		
 		self.title("CDP 2.0 GUI")
 		self.geometry(f"{self.WIDTH}x{self.HEIGHT}")
@@ -102,6 +105,9 @@ class App(ctk.CTk):
 
 		self.frame_right = ctk.CTkFrame(master=self)
 		self.frame_right.grid(row=0, column=1, sticky='nswe', padx=20, pady=10, columnspan=3)
+
+		self.frame_build_protocol_top = ctk.CTkFrame(master=self.frame_right, width=600, height=120)
+		self.frame_build_protocol_bottom = ctk.CTkFrame(master=self.frame_right, width=600, height=400)
 
 		# Left Frame.
 		self.label_1 = ctk.CTkLabel(master=self.frame_left, text="CDP 2.0", font=("Roboto Medium", -16))
@@ -227,8 +233,98 @@ class App(ctk.CTk):
 			self.label_units_anneal_time.place(x=187, y=395)
 			self.label_units_extension_time.place(x=267, y=395)
 		elif button_text == "Build Protocol":
-			self.label_build_protocol_1 = ctk.CTkLabel(self.frame_right, text="Build Protocol", font=("Roboto Medium", -16))
-			self.label_build_protocol_1.grid(row=1, column=0, pady=10, padx=10)
+			self.radiobutton_script_builder_iv = tkinter.IntVar(0)
+			self.radiobutton_script_builder = ctk.CTkRadioButton(master=self.frame_right, text="Script Builder", variable=self.radiobutton_script_builder_iv, command=self.script_builder_radiobutton_event)
+			self.radiobutton_script_builder.place(x=5, y=10)
+			self.radiobutton_drag_tool_iv = tkinter.IntVar()
+			self.radiobutton_drag_tool_iv.set(1)
+			self.radiobutton_drag_tool = ctk.CTkRadioButton(master=self.frame_right, text="Drag Tool", variable=self.radiobutton_drag_tool_iv, command=self.drag_tool_radiobutton_event)
+			self.radiobutton_drag_tool.place(x=130,y=10)
+			# Script builder defaults
+			self.label_build_protocol_tips = ctk.CTkLabel(master=self.frame_right, text='Tips', font=("Roboto Medium", -16))
+			self.label_build_protocol_tips.place(x=175, y=40)
+			self.label_build_protocol_tips_tray = ctk.CTkLabel(master=self.frame_right, text='Tray', font=("Roboto Light", -14))
+			self.label_build_protocol_tips_tray.place(x=65, y=65)
+			self.build_protocol_tips_tray_sv = StringVar('')
+			self.optionmenu_build_protocol_tips_tray = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_tray_sv, values=('A', 'B', 'C', 'D', "Tip Transfer Tray", ''), font=("Roboto Light", -12)) 
+			self.optionmenu_build_protocol_tips_tray.place(x=5, y=95, width=150)
+			self.label_build_protocol_tips_column = ctk.CTkLabel(master=self.frame_right, text='Column', font=("Roboto Light", -14))
+			self.label_build_protocol_tips_column.place(x=165, y=65)
+			self.build_protocol_tips_column_sv = StringVar('')
+			self.optionmenu_build_protocol_tips_column = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_column_sv, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''), font=("Roboto Light", -12))
+			self.optionmenu_build_protocol_tips_column.place(x=160, y=95, width=65)
+			self.label_build_protocol_tips_action = ctk.CTkLabel(master=self.frame_right, text='Action', font=("Roboto Medium", -14))
+			self.label_build_protocol_tips_action.place(x=245, y=65)
+			self.build_protocol_tips_action_sv = StringVar()
+			self.build_protocol_tips_action_sv.set('Eject')
+			self.optionmenu_build_protocol_tips_action = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_action_sv, values=('Eject', 'Pickup'), font=("Roboto Light", -12))
+			self.optionmenu_build_protocol_tips_action.place(x=230, y=95, width=80)
+			self.label_build_protocol_tips_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
+			self.label_build_protocol_tips_add.place(x=320, y=65)
+			self.button_build_protocol_tips_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_tips_add, fg_color='#4C7BD3') 
+			self.button_build_protocol_tips_add.place(x=315, y=95, width=40)
+			self.label_build_protocol_motion = ctk.CTkLabel(master=self.frame_right, text='Motion', font=("Roboto Medium", -16))
+			self.label_build_protocol_motion.place(x=165, y=130)
+			self.label_build_protocol_motion_consumable = ctk.CTkLabel(master=self.frame_right, text='Consumable', font=("Roboto Light", -14))
+			self.label_build_protocol_motion_consumable.place(x=30, y=150)
+			build_protocol_motion_consumable_sv = StringVar('')
+			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp", "Quant Strip", "Aux Heater"), font=("Roboto Light", -10)) 
+			self.optionmenu_build_protocol_motion_consumable.place(x=5, y=185, width=130)
+			self.label_build_protocol_motion_tray = ctk.CTkLabel(master=self.frame_right, text='Tray', font=("Roboto Light", -14))
+			self.label_build_protocol_motion_tray.place(x=150, y=155)
+			build_protocol_motion_tray_sv = StringVar('')
+			self.optionmenu_build_protocol_motion_tray = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_motion_tray_sv, values=('A', 'B', 'C', 'D', ''))
+			self.optionmenu_build_protocol_motion_tray.place(x=140,y=185,width=50)
+			self.label_build_protocol_motion_column = ctk.CTkLabel(master=self.frame_right, text='Column', font=("Roboto Light", -14))
+			self.label_build_protocol_motion_column.place(x=195, y=155)
+			build_protocol_motion_column_sv = StringVar('')
+			self.optionmenu_build_protocol_motion_column = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_motion_column_sv, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''), font=("Roboto Light", -12))
+			self.optionmenu_build_protocol_motion_column.place(x=195, y=185, width=55)
+			self.label_build_protocol_motion_tip = ctk.CTkLabel(master=self.frame_right, text='Tip (uL)', font=("Roboto Light", -14))
+			self.label_build_protocol_motion_tip.place(x=255, y=155)
+			build_protocol_motion_tip_sv = StringVar()
+			build_protocol_motion_tip_sv.set('1000')
+			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_motion_tip_sv, values=('1000', '50', '200', ''), font=("Roboto Light", -7)) 
+			self.optionmenu_build_protocol_motion_tip.place(x=255,y=185,width=55)
+			self.label_build_protocol_motion_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
+			self.label_build_protocol_motion_add.place(x=320, y=155)
+			self.button_build_protocol_motion_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_motion_add, fg_color='#4C7BD3') 
+			self.button_build_protocol_motion_add.place(x=315, y=185, width=40)
+			self.label_build_protocol_pipettor = ctk.CTkLabel(master=self.frame_right, text='Pipettor', font=("Roboto Medium", -16))
+			self.label_build_protocol_pipettor.place(x=165, y=220)
+			self.label_build_protocol_pipettor_volume = ctk.CTkLabel(master=self.frame_right, text='Volume (uL)', font=("Roboto Medium", -14))
+			self.label_build_protocol_pipettor_volume.place(x=10, y=240)
+			self.entry_build_protocol_pipettor_volume = ctk.CTkEntry(master=self.frame_right)
+			self.entry_build_protocol_pipettor_volume.place(x=5, y=270, width=80)
+			self.label_build_protocol_pipettor_tip = ctk.CTkLabel(master=self.frame_right, text='Tip (uL)', font=("Roboto Medium", -14))
+			self.label_build_protocol_pipettor_tip.place(x=120, y=240)
+			build_protocol_pipettor_tip = StringVar()
+			build_protocol_pipettor_tip.set('1000')
+			self.optionmenu_build_protocol_pipettor_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_pipettor_tip, values=('1000', '50', '200'))
+			self.optionmenu_build_protocol_pipettor_tip.place(x=90, y=270, width=100)
+			self.label_build_protocol_pipettor_action = ctk.CTkLabel(master=self.frame_right, text='Action', font=("Roboto Medium", -14))
+			self.label_build_protocol_pipettor_action.place(x=230,y=240)
+			build_protocol_pipettor_action_sv = StringVar()
+			build_protocol_pipettor_action_sv.set('Aspirate')
+			self.optionmenu_build_protocol_pipettor_action = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_pipettor_action_sv, values=('Aspirate', 'Dipense'))
+			self.optionmenu_build_protocol_pipettor_action.place(x=195, y=270, width=115)
+			self.label_build_protocol_pipettor_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
+			self.label_build_protocol_pipettor_add.place(x=320, y=240)
+			self.button_build_protocol_pipettor_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_pipettor_add, fg_color='#4C7BD3') 
+			self.button_build_protocol_pipettor_add.place(x=315, y=270, width=40)
+			self.label_build_protocol_time = ctk.CTkLabel(master=self.frame_right, text='Time', font=("Roboto Medium", -16))
+			self.label_build_protocol_time.place(x=180, y=305)
+			self.label_build_protocol_time_delay = ctk.CTkLabel(master=self.frame_right, text='Delay', font=("Roboto Medium", -14))
+			self.label_build_protocol_time_delay.place(x=120,y=320)
+			self.label_build_protocol_time_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
+			self.label_build_protocol_time_add.place(x=320, y=320)
+			self.button_build_protocol_time_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_time_add, fg_color='#4C7BD3') 
+			self.button_build_protocol_time_add.place(x=315, y=350, width=40)
+			# Treeview
+			self.treeview_build_protocol = tkinter.ttk.Treeview(self.frame_right, columns=('Action'))#, show='headings')
+			self.treeview_build_protocol.column('Action', width=195)
+			self.treeview_build_protocol.heading('Action', text='Action')
+			self.treeview_build_protocol.place(x=360,y=5, width=195, height=450)
 		elif button_text == 'Optimize':
 			image = Image.open('deck_plate.png').resize((560, 430))
 			self.img_deck_plate = ImageTk.PhotoImage(image)
@@ -286,6 +382,28 @@ class App(ctk.CTk):
 			self.label_service_1 = ctk.CTkLabel(master=self.frame_right, text='Service', font=("Roboto Medium", -16))
 			self.label_service_1.grid(row=1, column=0, pady=10, padx=10)
 		#self.update()
+
+	def script_builder_radiobutton_event(self):
+		self.radiobutton_drag_tool_iv.set(1)
+		self.radiobutton_script_builder_iv.set(0)
+
+	def drag_tool_radiobutton_event(self):
+		self.radiobutton_script_builder_iv.set(1)
+		self.radiobutton_drag_tool_iv.set(0)
+
+	def build_protocol_tips_add(self):
+		action_msg = f"{self.build_protocol_tips_action_sv.get()} tips " + self.build_protocol_tips_tray_sv.get() + " Column " + self.build_protocol_tips_column_sv.get()
+		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), text=action_msg)
+		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+
+	def build_protocol_motion_add(self):
+		print('here')
+
+	def build_protocol_pipettor_add(self):
+		print('here')
+
+	def build_protocol_time_add(self):
+		print('here')
 
 	def update_coordinate(self):
 		print("Update Coordinate")
