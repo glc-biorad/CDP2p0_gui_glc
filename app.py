@@ -1,5 +1,15 @@
 #!/usr/bin/env python3.8
 
+import pythonnet
+from pythonnet import load
+
+load("coreclr")
+
+from upper_gantry import UpperGantry
+from meerstetter import Meerstetter
+from fast_api_interface import FastAPIInterface
+
+import threading
 import os
 import getpass
 import datetime
@@ -35,10 +45,10 @@ class App(ctk.CTk):
 			'CD': True, # True (Open, homed), False (Closed),
 			},
 		'temperatures': {
-			'A': np.array([92,92, 55, 55, 84, 84]),
-			'B': np.array([92,92, 60, 60, 95, 95]),
-			'C': np.array([92,92, 55, 55, 84, 84]),
-			'D': np.array([92,92, 55, 55, 84, 84]),
+			'A': np.array([84,84, 55, 55, 84, 84]),
+			'B': np.array([84,84, 60, 60, 84, 84]),
+			'C': np.array([84,84, 55, 55, 84, 84]),
+			'D': np.array([84,84, 55, 55, 84, 84]),
 			},
 		'times': {
 			'A': {'denature': 5, 'anneal': 80, 'extension': 40},
@@ -75,12 +85,15 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
+		self.upper_gantry = UpperGantry()
+		self.fast_api_interface = FastAPIInterface()
+
 		self.use_z = tkinter.IntVar()
 		self.use_z.set(1)
 		self.slow_z = tkinter.IntVar()
 		self.slow_z.set(1)
 		self.pipette_tip_type = StringVar()
-		self.pipette_tip_type.set('')
+		self.pipette_tip_type.set(None)
 		self.dx = StringVar()
 		self.dx.set('500')
 		self.dy = StringVar()
@@ -106,30 +119,51 @@ class App(ctk.CTk):
 		self.frame_right = ctk.CTkFrame(master=self)
 		self.frame_right.grid(row=0, column=1, sticky='nswe', padx=20, pady=10, columnspan=3)
 
-		self.frame_build_protocol_top = ctk.CTkFrame(master=self.frame_right, width=600, height=120)
-		self.frame_build_protocol_bottom = ctk.CTkFrame(master=self.frame_right, width=600, height=400)
-
 		# Left Frame.
-		self.label_1 = ctk.CTkLabel(master=self.frame_left, text="CDP 2.0", font=("Roboto Medium", -16))
-		self.label_1.grid(row=1, column=0, pady=10, padx=10)
-		self.button_1 = ctk.CTkButton(master=self.frame_left, text='Image', command=lambda button_text='Image': self.on_button_click(button_text))
-		self.button_1.grid(row=2, column=0, pady=10, padx=20)
-		self.button_2 = ctk.CTkButton(master=self.frame_left, text='Thermocycle', command=lambda button_text='Thermocycle': self.on_button_click(button_text))
-		self.button_2.grid(row=3, column=0, pady=10, padx=20)
-		self.button_3 = ctk.CTkButton(master=self.frame_left, text="Build Protocol", command=lambda button_text="Build Protocol": self.on_button_click(button_text))
-		self.button_3.grid(row=4, column=0, pady=10, padx=20)
+		self.label_image = ctk.CTkLabel(master=self.frame_left, text="CDP 2.0", font=("Roboto Medium", -16))
+		self.label_image.grid(row=1, column=0, pady=10, padx=10)
+		self.button_image = ctk.CTkButton(master=self.frame_left, text='Image', command=lambda button_text='Image': self.on_button_click(button_text))
+		self.button_image.grid(row=2, column=0, pady=10, padx=20)
+		self.button_thermocycle = ctk.CTkButton(master=self.frame_left, text='Thermocycle', command=lambda button_text='Thermocycle': self.on_button_click(button_text))
+		self.button_thermocycle.grid(row=3, column=0, pady=10, padx=20)
+		self.button_build_protocol = ctk.CTkButton(master=self.frame_left, text="Build Protocol", command=lambda button_text="Build Protocol": self.on_button_click(button_text))
+		self.button_build_protocol.grid(row=4, column=0, pady=10, padx=20)
 		self.button_optimize = ctk.CTkButton(master=self.frame_left, text='Optimize', command=lambda button_text='Optimize': self.on_button_click(button_text))
 		self.button_optimize.grid(row=5, column=0, pady=10, padx=20)
-		self.button_4 = ctk.CTkButton(master=self.frame_left, text='Service', command=lambda button_text='Service': self.on_button_click(button_text))
-		self.button_4.grid(row=6, column=0, pady=10, padx=20)
+		self.button_service = ctk.CTkButton(master=self.frame_left, text='Service', command=lambda button_text='Service': self.on_button_click(button_text))
+		self.button_service.grid(row=6, column=0, pady=10, padx=20)
+		self.button_status = ctk.CTkButton(master=self.frame_left, text='Status', command=lambda button_text='Status': self.on_button_click(button_text))
+		self.button_status.grid(row=7, column=0, pady=10, padx=20)
+
+	def __toggle_frame_left_button_background(self, button_text):
+		self.button_image.configure(border_width=0)
+		self.button_thermocycle.configure(border_width=0)
+		self.button_build_protocol.configure(border_width=0)
+		self.button_optimize.configure(border_width=0)
+		self.button_service.configure(border_width=0)
+		self.button_status.configure(border_width=0)
+		if button_text == 'Image':
+			self.button_image.configure(border_color='#ffffff', border_width=2)
+		elif button_text == 'Thermocycle':
+			self.button_thermocycle.configure(border_color='#ffffff', border_width=2)
+		elif button_text == "Build Protocol":
+			self.button_build_protocol.configure(border_color='#ffffff', border_width=2)
+		elif button_text == 'Optimize':
+			self.button_optimize.configure(border_color='#ffffff', border_width=2)
+		elif button_text == 'Service':
+			self.button_service.configure(border_color='#ffffff', border_width=2)
+		elif button_text == 'Status':
+			self.button_status.configure(border_color='#ffffff', border_width=2)
 
 	def on_button_click(self, button_text):
 		# Clean up the Right Frame for updating
 		for widget in self.frame_right.winfo_children():
 			widget.destroy()
+		self.__toggle_frame_left_button_background(button_text)
 		if button_text == 'Image':
 			self.label_image_1 = ctk.CTkLabel(master=self.frame_right, text='Image', font=("Roboto Medium", -16))
 			self.label_image_1.grid(row=1, column=0, pady=10, padx=10)
+			self.button_image.configure()
 		elif button_text == 'Thermocycle':
 			#self.label_thermocycle_1 = ctk.CTkLabel(master=self.frame_right, text="Denature Temperature (Celsius)", font=("Roboto Medium", -16))
 			#self.label_thermocycle_1.grid(row=1, column=0, pady=10, padx=10)
@@ -267,24 +301,24 @@ class App(ctk.CTk):
 			self.label_build_protocol_motion.place(x=165, y=130)
 			self.label_build_protocol_motion_consumable = ctk.CTkLabel(master=self.frame_right, text='Consumable', font=("Roboto Light", -14))
 			self.label_build_protocol_motion_consumable.place(x=30, y=150)
-			build_protocol_motion_consumable_sv = StringVar('')
-			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp", "Quant Strip", "Aux Heater"), font=("Roboto Light", -10)) 
+			self.build_protocol_motion_consumable_sv = StringVar('')
+			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp", "Quant Strip", "Aux Heater"), font=("Roboto Light", -10)) 
 			self.optionmenu_build_protocol_motion_consumable.place(x=5, y=185, width=130)
 			self.label_build_protocol_motion_tray = ctk.CTkLabel(master=self.frame_right, text='Tray', font=("Roboto Light", -14))
 			self.label_build_protocol_motion_tray.place(x=150, y=155)
-			build_protocol_motion_tray_sv = StringVar('')
-			self.optionmenu_build_protocol_motion_tray = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_motion_tray_sv, values=('A', 'B', 'C', 'D', ''))
+			self.build_protocol_motion_tray_sv = StringVar('')
+			self.optionmenu_build_protocol_motion_tray = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tray_sv, values=('A', 'B', 'C', 'D', ''))
 			self.optionmenu_build_protocol_motion_tray.place(x=140,y=185,width=50)
 			self.label_build_protocol_motion_column = ctk.CTkLabel(master=self.frame_right, text='Column', font=("Roboto Light", -14))
 			self.label_build_protocol_motion_column.place(x=195, y=155)
-			build_protocol_motion_column_sv = StringVar('')
-			self.optionmenu_build_protocol_motion_column = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_motion_column_sv, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''), font=("Roboto Light", -12))
+			self.build_protocol_motion_column_sv = StringVar('')
+			self.optionmenu_build_protocol_motion_column = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_column_sv, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''), font=("Roboto Light", -12))
 			self.optionmenu_build_protocol_motion_column.place(x=195, y=185, width=55)
 			self.label_build_protocol_motion_tip = ctk.CTkLabel(master=self.frame_right, text='Tip (uL)', font=("Roboto Light", -14))
 			self.label_build_protocol_motion_tip.place(x=255, y=155)
-			build_protocol_motion_tip_sv = StringVar()
-			build_protocol_motion_tip_sv.set('1000')
-			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_motion_tip_sv, values=('1000', '50', '200', ''), font=("Roboto Light", -7)) 
+			self.build_protocol_motion_tip_sv = StringVar()
+			self.build_protocol_motion_tip_sv.set('1000')
+			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tip_sv, values=('1000', '50', '200', ''), font=("Roboto Light", -7)) 
 			self.optionmenu_build_protocol_motion_tip.place(x=255,y=185,width=55)
 			self.label_build_protocol_motion_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
 			self.label_build_protocol_motion_add.place(x=320, y=155)
@@ -298,15 +332,15 @@ class App(ctk.CTk):
 			self.entry_build_protocol_pipettor_volume.place(x=5, y=270, width=80)
 			self.label_build_protocol_pipettor_tip = ctk.CTkLabel(master=self.frame_right, text='Tip (uL)', font=("Roboto Medium", -14))
 			self.label_build_protocol_pipettor_tip.place(x=120, y=240)
-			build_protocol_pipettor_tip = StringVar()
-			build_protocol_pipettor_tip.set('1000')
-			self.optionmenu_build_protocol_pipettor_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_pipettor_tip, values=('1000', '50', '200'))
+			self.build_protocol_pipettor_tip = StringVar()
+			self.build_protocol_pipettor_tip.set('1000')
+			self.optionmenu_build_protocol_pipettor_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_tip, values=('1000', '50', '200'))
 			self.optionmenu_build_protocol_pipettor_tip.place(x=90, y=270, width=100)
 			self.label_build_protocol_pipettor_action = ctk.CTkLabel(master=self.frame_right, text='Action', font=("Roboto Medium", -14))
 			self.label_build_protocol_pipettor_action.place(x=230,y=240)
-			build_protocol_pipettor_action_sv = StringVar()
-			build_protocol_pipettor_action_sv.set('Aspirate')
-			self.optionmenu_build_protocol_pipettor_action = ctk.CTkOptionMenu(master=self.frame_right, variable=build_protocol_pipettor_action_sv, values=('Aspirate', 'Dipense'))
+			self.build_protocol_pipettor_action_sv = StringVar()
+			self.build_protocol_pipettor_action_sv.set('Aspirate')
+			self.optionmenu_build_protocol_pipettor_action = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_action_sv, values=('Aspirate', 'Dipense'))
 			self.optionmenu_build_protocol_pipettor_action.place(x=195, y=270, width=115)
 			self.label_build_protocol_pipettor_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
 			self.label_build_protocol_pipettor_add.place(x=320, y=240)
@@ -315,16 +349,43 @@ class App(ctk.CTk):
 			self.label_build_protocol_time = ctk.CTkLabel(master=self.frame_right, text='Time', font=("Roboto Medium", -16))
 			self.label_build_protocol_time.place(x=180, y=305)
 			self.label_build_protocol_time_delay = ctk.CTkLabel(master=self.frame_right, text='Delay', font=("Roboto Medium", -14))
-			self.label_build_protocol_time_delay.place(x=120,y=320)
+			self.label_build_protocol_time_delay.place(x=120,y=325)
+			self.entry_build_protocol_time_delay = ctk.CTkEntry(master=self.frame_right)
+			self.entry_build_protocol_time_delay.place(x=100, y=355, width=80)
+			self.label_build_protocol_time_units = ctk.CTkLabel(master=self.frame_right, text='Units', font=("Roboto Medium", -14))
+			self.label_build_protocol_time_units.place(x=215,y=325)
+			self.build_protocol_time_units_sv = StringVar()
+			self.build_protocol_time_units_sv.set('seconds')
+			self.optionmenu_build_protocol_time_units = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_time_units_sv, values=('seconds', 'minutes'))
+			self.optionmenu_build_protocol_time_units.place(x=185, y=355, width=100)
 			self.label_build_protocol_time_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
-			self.label_build_protocol_time_add.place(x=320, y=320)
+			self.label_build_protocol_time_add.place(x=320, y=325)
 			self.button_build_protocol_time_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_time_add, fg_color='#4C7BD3') 
-			self.button_build_protocol_time_add.place(x=315, y=350, width=40)
+			self.button_build_protocol_time_add.place(x=315, y=355, width=40)
+			self.label_build_protocol_other = ctk.CTkLabel(master=self.frame_right, text='Other', font=("Roboto Medium", -16))
+			self.label_build_protocol_other.place(x=180, y=390)
+			self.build_protocol_other_sv = StringVar()
+			self.build_protocol_other_sv.set('Generate Standard Droplets')
+			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=('Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet'))
+			self.optionmenu_build_protocol_other.place(x=100, y=420, width=200)
+			self.label_build_protocol_time_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
+			self.label_build_protocol_time_add.place(x=320, y=390)
+			self.button_build_protocol_other_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_other_add, fg_color='#4C7BD3') 
+			self.button_build_protocol_other_add.place(x=315, y=420, width=40)
+			self.button_build_protocol_start = ctk.CTkButton(master=self.frame_right, text='Start', command=self.build_protocol_start, fg_color='#4C7BD3')
+			self.button_build_protocol_start.place(x=75, y=460, width=80)
+			self.button_build_protocol_import = ctk.CTkButton(master=self.frame_right, text='Import', command=self.build_protocol_import)
+			self.button_build_protocol_import.place(x=160, y=460, width=80)
+			self.button_build_protocol_export = ctk.CTkButton(master=self.frame_right, text='Export', command=self.build_protocol_export)
+			self.button_build_protocol_export.place(x=245, y=460, width=80)
 			# Treeview
-			self.treeview_build_protocol = tkinter.ttk.Treeview(self.frame_right, columns=('Action'))#, show='headings')
-			self.treeview_build_protocol.column('Action', width=195)
+			self.scrollbar_treeview_build_protocol = tkinter.Scrollbar(self.frame_right, orient='horizontal')
+			self.treeview_build_protocol = tkinter.ttk.Treeview(self.frame_right, columns=('Action'), show='headings', xscrollcommand=self.scrollbar_treeview_build_protocol.set)
+			self.scrollbar_treeview_build_protocol.config(command=self.treeview_build_protocol.xview)
+			self.treeview_build_protocol.column('Action', width=400, stretch=False)
 			self.treeview_build_protocol.heading('Action', text='Action')
 			self.treeview_build_protocol.place(x=360,y=5, width=195, height=450)
+			self.scrollbar_treeview_build_protocol.place(x=360, y=460, width=195)
 		elif button_text == 'Optimize':
 			image = Image.open('deck_plate.png').resize((560, 430))
 			self.img_deck_plate = ImageTk.PhotoImage(image)
@@ -368,20 +429,53 @@ class App(ctk.CTk):
 			self.optionmenu_column.place(x=480, y=5, width=60)
 			self.label_tip = ctk.CTkLabel(master=self.frame_right, text='Tip Size (uL)', font=("Roboto Medium", -16))
 			self.label_tip.place(x=330, y=470)
-			self.optionmenu_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.pipette_tip_type, values=('1000', '50', '200', ''))
+			self.optionmenu_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.pipette_tip_type, values=('1000', '50', '200', 'None'))
 			self.optionmenu_tip.place(x=435, y=470, width=100)
 			self.checkbox_use_z = ctk.CTkCheckBox(master=self.frame_right, text="Use Z", variable=self.use_z, onvalue=1, offvalue=0) 
 			self.checkbox_use_z.place(x=330, y=40, width=100)
 			self.checkbox_slow_z = ctk.CTkCheckBox(master=self.frame_right, text="Slow Z", variable=self.slow_z, onvalue=1, offvalue=0)
 			self.checkbox_slow_z.place(x=330, y=70, width=100)
-			self.button_print = ctk.CTkButton(master=self.frame_right, text='Print', font=("Roboto Medium", -16), width=60, command=self.print_coordinate, height=45)
-			self.button_print.place(x=410, y=45)
+			self.button_move = ctk.CTkButton(master=self.frame_right, text='Move', font=("Roboto Medium", -16), width=60, command=self.optimize_move_pipettor, height=45)
+			self.button_move.place(x=410, y=45)
 			self.button_update = ctk.CTkButton(master=self.frame_right, text='Update', font=("Roboto Medium", -16), width=60, command=self.update_coordinate, height=45, fg_color='#4C7BD3') 
 			self.button_update.place(x=480, y=45)
+			self.button_print = ctk.CTkButton(master=self.frame_right, text='Print', font=("Roboto Medium", -14), width=60, command=self.print_coordinate, height=25, fg_color='#4C7BD3')
+			self.button_print.place(x=5, y=470)
 		elif button_text == 'Service':
 			self.label_service_1 = ctk.CTkLabel(master=self.frame_right, text='Service', font=("Roboto Medium", -16))
 			self.label_service_1.grid(row=1, column=0, pady=10, padx=10)
 		#self.update()
+
+	def build_protocol_start(self):
+		print('start protocol')
+
+	def build_protocol_import(self):
+		print('import protocol')
+
+	def build_protocol_export(self):
+		print('export protocol')
+
+	def optimize_move_pipettor(self):
+		# Get the name of the coordinate.
+		consumable = self.optionmenu_consumable.get()
+		tray = self.optionmenu_tray.get()
+		if tray == '':
+			tray = None
+		column = self.optionmenu_column.get()
+		if column == '':
+			column = None
+		use_z = self.checkbox_use_z.get()
+		use_drip_plate = False
+		slow_z = self.checkbox_slow_z.get()
+		pipette_tip_type = self.optionmenu_tip.get()
+		print(type(pipette_tip_type))
+		if pipette_tip_type == 'None':
+			pipette_tip_type = None
+		elif pipette_tip_type != 'None':
+			pipette_tip_type = int(pipette_tip_type)
+		# Move the pipettor.
+		if len(consumable) > 0:
+			self.upper_gantry.move_pipettor_new(consumable=consumable, tray=tray, row=column, use_z=use_z, use_drip_plate=use_drip_plate, slow_z=slow_z, pipette_tip_type=pipette_tip_type)
 
 	def script_builder_radiobutton_event(self):
 		self.radiobutton_drag_tool_iv.set(1)
@@ -393,23 +487,38 @@ class App(ctk.CTk):
 
 	def build_protocol_tips_add(self):
 		action_msg = f"{self.build_protocol_tips_action_sv.get()} tips " + self.build_protocol_tips_tray_sv.get() + " Column " + self.build_protocol_tips_column_sv.get()
-		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), text=action_msg)
+		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
 		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
 
 	def build_protocol_motion_add(self):
-		print('here')
+		action_msg = f"Move to {self.build_protocol_motion_consumable_sv.get()} Tray {self.build_protocol_motion_tray_sv.get()} Column {self.build_protocol_motion_column_sv.get()} with {self.build_protocol_motion_tip_sv.get()} uL tips"
+		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
 
 	def build_protocol_pipettor_add(self):
-		print('here')
+		action_msg = f"{self.build_protocol_pipettor_action_sv.get()} {self.entry_build_protocol_pipettor_volume.get()} uL"
+		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
 
 	def build_protocol_time_add(self):
-		print('here')
+		if int(self.entry_build_protocol_time_delay.get()) == 1:
+			units = self.build_protocol_time_units_sv.get()[:-1]
+		else:
+			units = self.build_protocol_time_units_sv.get()
+		action_msg = f"Delay for {self.entry_build_protocol_time_delay.get()} {units}"
+		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+
+	def build_protocol_other_add(self):
+		action_msg = self.build_protocol_other_sv.get()
+		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
 
 	def update_coordinate(self):
 		print("Update Coordinate")
 
 	def print_coordinate(self):
-		print("Print Coordinate")
+		self.upper_gantry.print_position()
 
 	def callback_dx(self, event):
 		self.dx = self.entry_dx.get()
@@ -479,6 +588,11 @@ Times:
 
 ------------------------------------------------------""")
 		# Start timers for the thermocyclers
+		# Start a thread
+		thread = threading.Thread(target=self.thermocycle)
+		thread.start()
+
+	def thermocycle(self):
 		# Get the number of cycles for each thermocycler
 		cycles_A = int(self.thermocyclers['cycles']['A'])
 		cycles_B = int(self.thermocyclers['cycles']['B'])
@@ -512,9 +626,37 @@ Times:
 		extension_temperature_D = int(self.thermocyclers['temperatures']['D'][4])
 		# Denature
 		time_start = time.time()
+		meersetter = Meerstetter()
+		meersetter.change_temperature(1, denature_temperature_A, False)
+		meersetter.change_temperature(2, denature_temperature_B, False)
+		#meersetter.change_temperature(3, denature_temperature_C, False)
+		meersetter.change_temperature(4, denature_temperature_D, False)
+		for sec in range(int(denature_time_A * 60)):
+			time.sleep(1)
+		print('done')
 		# Thermocycle
+		cycles = [i for i in range(self.thermocyclers['cycles']['A'])]
+		for cycle in cycles:
+			print(f"Cycle Number: {cycle}/{len(cycles)}")
+			meersetter.change_temperature(1, extension_temperature_A, False)
+			meersetter.change_temperature(2, extension_temperature_B, False)
+			#meersetter.change_temperature(3, extension_temperature_C, False)
+			meersetter.change_temperature(4, extension_temperature_D, False)
+			for sec in range(int(denature_time_A * 60)):
+				time.sleep(1)
+			meersetter.change_temperature(1, anneal_temperature_A, False)
+			meersetter.change_temperature(2, anneal_temperature_B, False)
+			#meersetter.change_temperature(3, anneal_temperature_C, False)
+			meersetter.change_temperature(4, anneal_temperature_D, False)
+			for sec in range(int(denature_time_A * 60)):
+				time.sleep(1)
 		# End temperatue
-	
+		meersetter.change_temperature(1, 30, False)
+		meersetter.change_temperature(2, 30, False)
+		#meersetter.change_temperature(3, 30, False)
+		meersetter.change_temperature(4, 30, False)
+
+
 	def browse_files(self):
 		file = tkinter.filedialog.asksaveasfile(initialfile='thermocycler_protocol.txt', initialdir = './', title="Save Protocol to File")
 		return file
@@ -522,8 +664,41 @@ Times:
 	def import_thermocyclers(self) -> None:
 		a = 1
 
-	def export_thermocyclers(self) -> None:
-		a = 1
+	def test1(self):
+		payload = PeltierPayload('get', 1000)
+		address = 1
+		pcom = PeltierCommunication('#', 1, 1, payload,None)
+		self.__controller.write(pcom.to_string())
+		#self.__increase_sequence_number(address)
+        # Get the response back.
+		response = self.__controller.readline()
+        # Compare the response.
+        #pcom.compare_with_response(response, assert_checksum=False)
+        # Get the object temperature from the response.
+		temperature_hexidecimal = response[7:-4]
+		temperature = convert_hexidecimal_to_float32_ieee_754(temperature_hexidecimal)
+		print(temperature)
+
+	def test2(self):
+		payload = PeltierPayload('get', 1000)
+		address = 2
+		pcom = PeltierCommunication('#', 2, 1, payload,None)
+		self.__controller.write(pcom.to_string())
+		#self.__increase_sequence_number(address)
+        # Get the response back.
+		response = self.__controller.readline()
+        # Compare the response.
+        #pcom.compare_with_response(response, assert_checksum=False)
+        # Get the object temperature from the response.
+		temperature_hexidecimal = response[7:-4]
+		temperature = convert_hexidecimal_to_float32_ieee_754(temperature_hexidecimal)
+		print(temperature)
+
+	def export_thermocyclers(self):
+		t1 = threading.Thread(target=self.test1)
+		t2 = threading.Thread(target=self.test2)
+		t1.run()
+		t2.run()
 
 	def plot_thermocycler(self, data) -> None:
 		fig = Figure(figsize=(3,2.4))
@@ -557,26 +732,50 @@ Times:
 				# Check what the user is hovering over and toggle the component on click.
 				if x >= 130 and x <= 238:
 					if y >= 30 and y <= 124:
-						clicked_on = 'A'
-						self.thermocyclers['clamps']['A']['homed'] = not self.thermocyclers['clamps']['A']['homed']
+						if self.thermocyclers['clamps']['A']['homed']:
+							self.fast_api_interface.reader.axis.move('reader', 8, -400000, 80000, False, True)
+							self.thermocyclers['clamps']['A']['homed'] = False
+						else:
+							self.fast_api_interface.reader.axis.home('reader', 8, False, True)
+							self.thermocyclers['clamps']['A']['homed'] = True
 					elif y >= 128 and y <= 222:
-						clicked_on = 'B'
-						self.thermocyclers['clamps']['B']['homed'] = not self.thermocyclers['clamps']['B']['homed']
+						if self.thermocyclers['clamps']['B']['homed']:
+							self.fast_api_interface.reader.axis.move('reader', 9, -400000, 80000, False, True)
+							self.thermocyclers['clamps']['B']['homed'] = False
+						else:
+							self.fast_api_interface.reader.axis.home('reader', 9, False, True)
+							self.thermocyclers['clamps']['B']['homed'] = True
 					elif y >= 248 and y <= 345:
-						clicked_on = 'C'
-						self.thermocyclers['clamps']['C']['homed'] = not self.thermocyclers['clamps']['C']['homed']
+						if self.thermocyclers['clamps']['C']['homed']:
+							self.fast_api_interface.reader.axis.move('reader', 10, -400000, 80000, False, True)
+							self.thermocyclers['clamps']['C']['homed'] = False
+						else:
+							self.fast_api_interface.reader.axis.home('reader', 10, False, True)
+							self.thermocyclers['clamps']['C']['homed'] = True
 					elif y >= 348 and y <= 446:
-						clicked_on = 'D'
-						self.thermocyclers['clamps']['D']['homed'] = not self.thermocyclers['clamps']['D']['homed']
+						if self.thermocyclers['clamps']['D']['homed']:
+							self.fast_api_interface.reader.axis.move('reader', 11, -400000, 80000, False, True)
+							self.thermocyclers['clamps']['D']['homed'] = False
+						else:
+							self.fast_api_interface.reader.axis.home('reader', 11, False, True)
+							self.thermocyclers['clamps']['D']['homed'] = True
 				elif x >= 7	and x <= 118:
 					if y >= 8 and y <= 234:
-						clicked_on = 'AB'
 						if self.thermocyclers['clamps']['A']['homed'] and self.thermocyclers['clamps']['B']['homed']:
-							self.thermocyclers['trays']['AB']['homed'] = not self.thermocyclers['trays']['AB']['homed']
+							if self.thermocyclers['trays']['AB']['homed']:
+								self.fast_api_interface.reader.axis.move('reader', 6, -790000, 200000, False, True)
+								self.thermocyclers['trays']['AB']['homed'] = False
+							else:
+								self.fast_api_interface.reader.axis.home('reader', 6, False, True)
+								self.thermocyclers['trays']['AB']['homed'] = True
 					elif y >= 238 and y <= 464:
-						clicked_on = 'CD'
 						if self.thermocyclers['clamps']['C']['homed'] and self.thermocyclers['clamps']['D']['homed']:
-							self.thermocyclers['trays']['CD']['homed'] = not self.thermocyclers['trays']['CD']['homed']
+							if self.thermocyclers['trays']['CD']['homed']:
+								self.fast_api_interface.reader.axis.move('reader', 7, -790000, 200000, False, True)
+								self.thermocyclers['trays']['CD']['homed'] = False
+							else:
+								self.fast_api_interface.reader.axis.home('reader', 7, False, True)
+								self.thermocyclers['trays']['CD']['homed']  = True
 				# Change the thermocycler picture.
 				self.thermocycler_dict = {
 						'A': self.thermocyclers['clamps']['A']['homed'],
@@ -743,10 +942,45 @@ Times:
 					elif y >= 340 and y <= 426:
 						tray_options.set('D')
 				# Reagent Cartridge
+				if x >= 305 and x <= 425:
+					consumable_options.set('Reagent Cartridge')
+					print(f'{x},{y}')
+					if y >= 61 and y <= 146:
+						tray_options.set('A')
+					elif y >= 154 and y <= 240:
+						tray_options.set('B')
+					elif y >= 246 and y <= 331:
+						tray_options.set('C')
+					elif y >= 338 and y <= 423:
+						tray_options.set('D')
+					if x >= 305 and x <= 316:
+						column_options.set('1')
+					elif x >= 317 and x <= 324:
+						column_options.set('2')
+					elif x >= 325 and x <= 335:
+						column_options.set('3')
+					elif x >= 336 and x <= 345:
+						column_options.set('4')
+					elif x >= 346 and x <= 355:
+						column_options.set('5')
+					elif x >= 356 and x <= 365:
+						column_options.set('6')
+					elif x >= 366 and x <= 374:
+						column_options.set('7')
+					elif x >= 375 and x <= 384:
+						column_options.set('8')
+					elif x >= 385 and x <= 394:
+						column_options.set('9')
+					elif x >= 395 and x <= 403:
+						column_options.set('10')
+					elif x >= 404 and x <= 413:
+						column_options.set('11')
+					elif x >= 414 and x <= 425:
+						column_options.set('12')
 				# Sample Rack
 				if x >= 266 and x <= 298:
 					consumable_options.set('Sample Rack')
-					column_options.set('1')
+					column_options.set('')
 					if y >= 62 and y <= 150:
 						tray_options.set('A')
 					elif y >= 154 and y <= 243: 
@@ -758,7 +992,7 @@ Times:
 				# Aux Heater
 				if x >= 232 and x <= 258:
 					consumable_options.set('Aux Heater')
-					column_options.set('1')
+					column_options.set('')
 					if y >= 62 and y <= 150:
 						tray_options.set('A')
 					elif y >= 154 and y <= 243: 
@@ -799,6 +1033,8 @@ Times:
 						column_options.set('7')
 					elif x >= 177 and x <= 186:
 						column_options.set('8')
+				# Reagent Cartridge
+
 				# Chiller
 				# Pre-Amp Thermocycler
 				# Lid Tray
@@ -903,10 +1139,41 @@ Times:
 	def on_closing(self, event=0) -> None:
 		self.destroy()
 
+	def backwards(self, event):
+		dy = int(self.entry_dy.get())
+		self.upper_gantry.move_relative('backwards', dy)
+
+	def left(self, event):
+		dx = int(self.entry_dx.get())
+		self.upper_gantry.move_relative('left', dx)
+
+	def forwards(self, event):
+		dy = int(self.entry_dy.get())
+		self.upper_gantry.move_relative('forwards', dy)
+
+	def right(self, event):
+		dx = int(self.entry_dx.get())
+		self.upper_gantry.move_relative('right', dx)
+
+	def up(self, event):
+		print("HERE")
+		dz = int(self.entry_dz.get())
+		self.upper_gantry.move_relative('up', dz)
+
+	def down(self, event):
+		dz = int(self.entry_dz.get())
+		self.upper_gantry.move_relative('down', dz)
+
 if __name__ == '__main__':
 	app = App()
 	app.iconbitmap('bio-rad-logo.ico')
 	app.bind('<Return>', app.enter)
+	app.bind('<Up>', app.backwards)
+	app.bind('<Left>', app.left)
+	app.bind('<Down>', app.forwards)
+	app.bind('<Right>', app.right)
+	app.bind('<Shift Up>', app.up)
+	app.bind('<Shift Down>', app.down)
 	app.maxsize(780,520)
 	app.minsize(780,520)
 	app.mainloop()
