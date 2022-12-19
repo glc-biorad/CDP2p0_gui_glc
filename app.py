@@ -1,17 +1,21 @@
 #!/usr/bin/env python3.8
 
-#import pythonnet
-#from pythonnet import load
+import pythonnet
+from pythonnet import load
 
-#load("coreclr")
+load("coreclr")
 
-#from upper_gantry import UpperGantry
-#from meerstetter import Meerstetter
-#from fast_api_interface import FastAPIInterface
+from utils import delay
+from script import Script
+from upper_gantry import UpperGantry
+from meerstetter import Meerstetter
+from fast_api_interface import FastAPIInterface
+from uvicorn_server import UvicornServer
 
 # Needed to do for pandas:
 # python3.8 -m pip install openpyxl
 
+import uvicorn
 import pandas as pd
 import threading
 import os
@@ -28,6 +32,11 @@ import numpy as np
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+
+# Import Office365 for using SharePoint
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
+from office365.sharepoint.files.file import File
 
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('green')
@@ -89,8 +98,11 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
-		self.upper_gantry = None #UpperGantry()
-		self.fast_api_interface = None #FastAPIInterface()
+		self.server = UvicornServer()
+		self.server.start()
+		self.script = Script()
+		self.upper_gantry = UpperGantry()
+		self.fast_api_interface = FastAPIInterface()
 
 		self.use_z = tkinter.IntVar()
 		self.use_z.set(1)
@@ -119,12 +131,23 @@ class App(ctk.CTk):
 		self.settings_unit_sv = StringVar()
 		self.settings_unit_sv.set('A')
 
+		# Volume in tips
+		self.pipettor_current_volume = 0
+
+		# Build Protocol
+		self.build_protocol_action_list = []
+
 		self.build_protocol_treeview_row_index = 0
 		self.status_treeview_row_index = 0
 		
 		self.title("CDP 2.0 GUI")
 		self.geometry(f"{self.WIDTH}x{self.HEIGHT}")
 		self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+		# Treeview style.
+		self.style_treeview = tkinter.ttk.Style(self)
+		self.style_treeview.theme_use('clam')
+		self.style_treeview.configure("Treeview", background='#2b2b2b', fieldbackground='#2b2b2b', foreground='#2b2b2b')
 		
 		# Create two frames.
 		self.grid_columnconfigure(1, weight=1)
@@ -361,24 +384,31 @@ class App(ctk.CTk):
 			self.label_build_protocol_pipettor = ctk.CTkLabel(master=self.frame_right, text='Pipettor', font=("Roboto Medium", -16))
 			self.label_build_protocol_pipettor.place(x=5, y=160)
 			# Pipettor: Volume
-			self.label_build_protocol_pipettor_volume = ctk.CTkLabel(master=self.frame_right, text='Volume (uL)', font=("Roboto Medium", -14))
-			self.label_build_protocol_pipettor_volume.place(x=87, y=130)
+			self.label_build_protocol_pipettor_volume = ctk.CTkLabel(master=self.frame_right, text='Vol. (uL)', font=("Roboto Medium", -14))
+			self.label_build_protocol_pipettor_volume.place(x=82, y=130)
 			self.entry_build_protocol_pipettor_volume = ctk.CTkEntry(master=self.frame_right)
-			self.entry_build_protocol_pipettor_volume.place(x=85, y=160, width=75)
+			self.entry_build_protocol_pipettor_volume.place(x=85, y=160, width=45)
 			# Pipettor: Tip
 			self.label_build_protocol_pipettor_tip = ctk.CTkLabel(master=self.frame_right, text='Tip (uL)', font=("Roboto Medium", -14))
-			self.label_build_protocol_pipettor_tip.place(x=200, y=130)
+			self.label_build_protocol_pipettor_tip.place(x=150, y=130)
 			self.build_protocol_pipettor_tip = StringVar()
 			self.build_protocol_pipettor_tip.set('1000')
 			self.optionmenu_build_protocol_pipettor_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_tip, values=('1000', '50', '200'))
-			self.optionmenu_build_protocol_pipettor_tip.place(x=165, y=160, width=100)
+			self.optionmenu_build_protocol_pipettor_tip.place(x=135, y=160, width=70)
 			# Pipettor: Action
 			self.label_build_protocol_pipettor_action = ctk.CTkLabel(master=self.frame_right, text='Action', font=("Roboto Medium", -14))
-			self.label_build_protocol_pipettor_action.place(x=310,y=130)
+			self.label_build_protocol_pipettor_action.place(x=230,y=130)
 			self.build_protocol_pipettor_action_sv = StringVar()
 			self.build_protocol_pipettor_action_sv.set('Aspirate')
-			self.optionmenu_build_protocol_pipettor_action = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_action_sv, values=('Aspirate', 'Dipense'))
-			self.optionmenu_build_protocol_pipettor_action.place(x=270, y=160, width=115)
+			self.optionmenu_build_protocol_pipettor_action = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_action_sv, values=('Aspirate', 'Dispense'))
+			self.optionmenu_build_protocol_pipettor_action.place(x=210, y=160, width=90)
+			# Pipettor: Pressure
+			self.label_build_protocol_pipettor_pressure = ctk.CTkLabel(master=self.frame_right, text='Pressure', font=("Roboto Medium", -14))
+			self.label_build_protocol_pipettor_pressure.place(x=320, y=130)
+			self.build_protocol_pipettor_pressure_sv = StringVar()
+			self.build_protocol_pipettor_pressure_sv.set('High')
+			self.optionmenu_build_protocol_pipettor_pressure = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_pressure_sv, values=('High', 'Low'))
+			self.optionmenu_build_protocol_pipettor_pressure.place(x=305, y=160, width=80)
 			# Pipettor: Add
 			self.label_build_protocol_pipettor_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
 			self.label_build_protocol_pipettor_add.place(x=397, y=130)
@@ -411,8 +441,8 @@ class App(ctk.CTk):
 			self.label_build_protocol_other_options = ctk.CTkLabel(master=self.frame_right, text='Options', font=("Roboto Medium", -16))
 			self.label_build_protocol_other_options.place(x=150, y=250)
 			self.build_protocol_other_sv = StringVar()
-			self.build_protocol_other_sv.set('Generate Standard Droplets')
-			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=('Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet'))
+			self.build_protocol_other_sv.set("Home Pipettor")
+			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=("Home Pipettor", "Move Relative Left", "Move Relative Right", "Move Relative Backwards", "Move Relative Forwards", "Move Relative Down", "Move Relative Up", 'Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet'))
 			self.optionmenu_build_protocol_other.place(x=85, y=280, width=200)
 			# Other: Add
 			self.label_build_protocol_time_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
@@ -440,6 +470,7 @@ class App(ctk.CTk):
 			self.treeview_build_protocol.place(x=5,y=320, width=550, height=160)
 			self.scrollbar_treeview_build_protocol.place(x=5, y=480, width=550)
 			self.treeview_build_protocol.bind('<Double-Button-1>', self.on_click)
+			self.__fill_build_protocol_treeview()
 		elif button_text == 'Optimize':
 			image = Image.open('deck_plate.png').resize((560, 430))
 			self.img_deck_plate = ImageTk.PhotoImage(image)
@@ -612,27 +643,160 @@ class App(ctk.CTk):
 		self.radiobutton_status_unit_C_iv.set(0)
 
 	def build_protocol_start(self):
+		self.button_build_protocol_start.configure(state=tkinter.DISABLED)
+		thread = threading.Thread(target=self.start_protocol)
+		thread.start()
+
+	def start_protocol(self):
+		for row in self.treeview_build_protocol.get_children():
+			self.treeview_build_protocol.selection_set(row)
+			action_msg = self.treeview_build_protocol.item(row)['values'][0]
+			# Parse the action message to determine which command to run.
+			if "Eject" in action_msg:
+				if "Tray" not in action_msg:
+					self.upper_gantry.tip_eject()
+				if "Column" in action_msg:
+					split = action_msg.split()
+					tray = split[3]
+					if tray == 'Tip':
+						tray = 'tip_transfer_tray'
+					column = int(split[-1])
+					self.upper_gantry.tip_eject(tray, column)
+			elif "Pickup" in action_msg:
+				if "Column" in action_msg:
+					split = action_msg.split()
+					tray = split[3]
+					if tray == 'Tip':
+						tray = 'tip_transfer_tray'
+					column = int(split[-1])
+					self.upper_gantry.tip_pickup(tray, column)
+			elif "Move" in action_msg:
+				split = action_msg.split()
+				consumable = split[2]
+				tray = None
+				column = None
+				pipette_tip_type = None
+				if consumable == 'Reagent':
+					consumable = "Reagent Cartridge"
+				elif consumable == 'Sample':
+					consumable = "Sample Rack"
+				elif consumable == 'Mag':
+					consumable = "Mag Separator"
+				elif consumable == 'Assay':
+					consumable = "Assay Strip"
+				elif consumable == "Pre-Amp":
+					consumable = "Pre-Amp Thermocycler"
+				elif consumable == 'Qaunt':
+					consumable = "Quant Strip"
+				elif consumable == 'Aux':
+					consumable = "Aux Heater"
+				else:
+					consumable = consumable
+				# Check if a tray is specified
+				if 'Tray' in split:
+					index = split.index('Tray')
+					tray = split[index+1]
+				if 'Column' in split:
+					index = split.index('Column')
+					column = int(split[index+1])
+				try:
+					pipette_tip_type = int(split[-3])
+					print(pipette_tip_type)
+				except:
+					pipette_tip_type = None
+				self.upper_gantry.move_pipettor_new(consumable=consumable, tray=tray, row=column, pipette_tip_type=pipette_tip_type, use_drip_plate=False)
+			elif "Aspirate" in action_msg:
+				split = action_msg.split()
+				vol = int(split[1])
+				tip = int(split[4])
+				pressure = split[8].lower()
+				self.upper_gantry.aspirate(vol, pressure=pressure, pipette_tip_type=tip)
+			elif "Dispense" in action_msg:
+				split = action_msg.split()
+				vol = int(split[1])
+				tip = int(split[4])
+				pressure = split[8].lower()
+				self.upper_gantry.dispense(vol, pressure=pressure)
+			elif "Delay" in action_msg:
+				split = action_msg.split()
+				time_value = int(split[2])
+				time_unit = split[-1]
+				delay(time_value, time_unit)
+			elif "Home Pipettor" in action_msg:
+				self.upper_gantry.home_pipettor()
+			elif "Transfer Plasma" in action_msg:
+				self.script.transfer_plasma(self.upper_gantry, full_protocol=False)
+			elif "Binding" in action_msg:
+				self.script.binding(self.upper_gantry, full_protocol=False)
+			elif "Pooling" in action_msg:
+				self.script.pooling(self.upper_gantry, full_protocol=False)
+			elif "Wash 1" in action_msg:
+				self.script.wash(self.upper_gantry, wash_number=1, wash_rounds=2, full_protocol=False)
+			elif "Wash 2" in action_msg:
+				self.script.wash(self.upper_gantry, wash_number=2, wash_rounds=1, full_protocol=False)
+			elif "Pre-Elution" in action_msg:
+				self.script.pre_elution(self.upper_gantry, full_protocol=False)
+			elif "Elution" in action_msg:
+				self.script.elution(self.upper_gantry, full_protocol=False)
+			elif "Extraction" in action_msg:
+				self.script.extraction(self.upper_gantry, full_protocol=False)
+			elif "Generate Standard Droplets" in action_msg:
+				self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
+			elif "Generate Pico Droplets" in action_msg:
+				self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
+			elif "Assay Prep" in action_msg:
+				self.script.assay_prep(self.upper_gantry)
+			elif "Engage Magnet" in action_msg:
+				self.upper_gantry.engage_magnet()
+			elif "Disengage Magnet" in action_msg:
+				self.upper_gantry.disengage_magnet()
+			elif "Move Relative Up" in action_msg:
+				self.upper_gantry.move_relative('up', self.dz, velocity='fast')
+			elif "Move Relative Down" in action_msg:
+				self.upper_gantry.move_relative('down', self.dz, velocity='fast')
+			elif "Move Relative Left" in action_msg:
+				self.upper_gantry.move_relative('left', self.dx, velocity='fast')
+			elif "Move Relative Right" in action_msg:
+				self.upper_gantry.move_relative('right', self.dx, velocity='fast')
+			elif "Move Relative Backwards" in action_msg:
+				self.upper_gantry.move_relative('backwards', self.dy, velocity='fast')
+			elif "Move Relative Forwards" in action_msg:
+				self.upper_gantry.move_relative('forwards', self.dy, velocity='fast')
+		self.button_build_protocol_start.configure(state=tkinter.NORMAL)
 		print('start protocol')
 
 	def build_protocol_import(self):
-		print('import protocol')
+		# Write the Build Protocol from a txt file to the Build Protocol Treeview
+		file = tkinter.filedialog.askopenfile(initialfile='protocol.txt', initialdir = './', title="Open Protocol to File")
+		lines = [line.rstrip('n') for line in file]
+		for row in self.treeview_build_protocol.get_children():
+			self.treeview_build_protocol.delete(row)
+		for line in lines:
+			action_msg = line
+			self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+			self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
 
 	def build_protocol_export(self):
-		print('export protocol')
+		# Write the Build Protocol Treeview to a txt file.
+		file = self.browse_files('protocol.txt')
+		for row in self.treeview_build_protocol.get_children():
+			file.write(f"{self.treeview_build_protocol.item(row)['values'][0]}\n")
+		file.close()
 
 	def build_protocol_delete(self):
 		try:
 			selected_row = self.treeview_build_protocol.selection()[0]
 			self.treeview_build_protocol.delete(selected_row)
+			self.__update_build_protocol_action_list()
 		except:
 			pass
 
 	def home_pipettor_z(self):
-		print('home_z')
+		self.fast_api_interface.pipettor_gantry.axis.home('pipettor_gantry', 3, False, True)
 	def home_pipettor_y(self):
-		print('home_y')
+		self.fast_api_interface.pipettor_gantry.axis.home('pipettor_gantry', 2, False, True)
 	def home_pipettor_x(self):
-		print('home_x')
+		self.fast_api_interface.pipettor_gantry.axis.home('pipettor_gantry', 1, False, True)
 
 	def optimize_move_pipettor(self):
 		# Get the name of the coordinate.
@@ -647,13 +811,13 @@ class App(ctk.CTk):
 		use_drip_plate = False
 		slow_z = self.checkbox_slow_z.get()
 		pipette_tip_type = self.optionmenu_tip.get()
-		print(type(pipette_tip_type))
 		if pipette_tip_type == 'None':
 			pipette_tip_type = None
 		elif pipette_tip_type != 'None':
 			pipette_tip_type = int(pipette_tip_type)
 		# Move the pipettor.
 		if len(consumable) > 0:
+			print(consumable)
 			self.upper_gantry.move_pipettor_new(consumable=consumable, tray=tray, row=column, use_z=use_z, use_drip_plate=use_drip_plate, slow_z=slow_z, pipette_tip_type=pipette_tip_type)
 
 	def script_builder_radiobutton_event(self):
@@ -664,20 +828,66 @@ class App(ctk.CTk):
 		self.radiobutton_script_builder_iv.set(1)
 		self.radiobutton_drag_tool_iv.set(0)
 
+	def __reorder_treeview_build_protocol_rows(self):
+		selected_row = self.treeview_build_protocol.selection()[0]
+		self.build_protocol_action_list = []
+		for row in self.treeview_build_protocol.get_children():
+			self.build_protocol_action_list.append(self.treeview_build_protocol.item(row)['values'][0])
+			self.treeview_build_protocol.delete(row)
+		for i in range(len(self.build_protocol_action_list)):
+			self.treeview_build_protocol.insert('','end',f'row{i}',values=(self.build_protocol_action_list[i],))
+
+	def __update_build_protocol_action_list(self):
+		self.build_protocol_action_list = []
+		for row in self.treeview_build_protocol.get_children():
+			self.build_protocol_action_list.append(self.treeview_build_protocol.item(row)['values'][0])
+
+	def __fill_build_protocol_treeview(self):
+		for i in range(len(self.build_protocol_action_list)):
+			self.treeview_build_protocol.insert('','end',f'row{i}',values=(self.build_protocol_action_list[i],))
+
+	def build_protocol_add(self, action_msg: str):
+		try:
+			# Get the selected row.
+			selected_row = self.treeview_build_protocol.selection()[0]
+			print(self.treeview_build_protocol.focus())
+			# Insert the data below the selected row
+			self.treeview_build_protocol.insert('', int(selected_row.replace('row', ''))+1, iid='row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+			self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+			self.__reorder_treeview_build_protocol_rows()
+		except:
+			# Insert the data at the bottom
+			self.treeview_build_protocol.insert('', 'end', iid='row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+			self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+		self.__update_build_protocol_action_list()
+
 	def build_protocol_tips_add(self):
-		action_msg = f"{self.build_protocol_tips_action_sv.get()} tips " + self.build_protocol_tips_tray_sv.get() + " Column " + self.build_protocol_tips_column_sv.get()
-		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
-		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+		action_msg = f"{self.build_protocol_tips_action_sv.get()} tips"# + self.build_protocol_tips_tray_sv.get() + " Column " + self.build_protocol_tips_column_sv.get()
+		if self.build_protocol_tips_tray_sv.get() != '':
+			action_msg = action_msg + f" Tray {self.build_protocol_tips_tray_sv.get()}"
+		if self.build_protocol_tips_column_sv.get() != '':
+			action_msg = action_msg + f" Column {self.build_protocol_tips_column_sv.get()}"
+		self.build_protocol_add(action_msg)
 
 	def build_protocol_motion_add(self):
-		action_msg = f"Move to {self.build_protocol_motion_consumable_sv.get()} Tray {self.build_protocol_motion_tray_sv.get()} Column {self.build_protocol_motion_column_sv.get()} with {self.build_protocol_motion_tip_sv.get()} uL tips"
-		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
-		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+		action_msg = f"Move to {self.build_protocol_motion_consumable_sv.get()}"#" Tray {self.build_protocol_motion_tray_sv.get()} Column {self.build_protocol_motion_column_sv.get()} with {self.build_protocol_motion_tip_sv.get()} uL tips"
+		if self.build_protocol_motion_tray_sv.get() != '':
+			action_msg = action_msg + f" Tray {self.build_protocol_motion_tray_sv.get()}"
+		if self.build_protocol_motion_column_sv.get() != '':
+			action_msg = action_msg + f" Column {self.build_protocol_motion_column_sv.get()}"
+		if self.build_protocol_motion_tip_sv.get() != None:
+			action_msg = action_msg + f" with {self.build_protocol_motion_tip_sv.get()} uL tips"
+		self.build_protocol_add(action_msg)
 
 	def build_protocol_pipettor_add(self):
-		action_msg = f"{self.build_protocol_pipettor_action_sv.get()} {self.entry_build_protocol_pipettor_volume.get()} uL"
-		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
-		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+		try:
+			vol = int(self.entry_build_protocol_pipettor_volume.get())
+			tip = int(self.optionmenu_build_protocol_pipettor_tip.get())
+			pressure = self.optionmenu_build_protocol_pipettor_pressure.get()
+			action_msg = f"{self.build_protocol_pipettor_action_sv.get()} {vol} uL with {tip} uL tips at {pressure.lower()} pressure"
+			self.build_protocol_add(action_msg)
+		except:
+			pass
 
 	def build_protocol_time_add(self):
 		if int(self.entry_build_protocol_time_delay.get()) == 1:
@@ -685,13 +895,11 @@ class App(ctk.CTk):
 		else:
 			units = self.build_protocol_time_units_sv.get()
 		action_msg = f"Delay for {self.entry_build_protocol_time_delay.get()} {units}"
-		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
-		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+		self.build_protocol_add(action_msg)
 
 	def build_protocol_other_add(self):
 		action_msg = self.build_protocol_other_sv.get()
-		self.treeview_build_protocol.insert('', 'end', 'row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
-		self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+		self.build_protocol_add(action_msg)
 
 	def update_coordinate(self):
 		print("Update Coordinate")
@@ -765,6 +973,7 @@ Times:
 	Anneal: {int(self.thermocyclers['times']['D']['anneal'])} sec
 	Extension: {int(self.thermocyclers['times']['D']['extension'])} sec
 
+
 ------------------------------------------------------""")
 		# Start timers for the thermocyclers
 		# Start a thread
@@ -836,8 +1045,8 @@ Times:
 		meersetter.change_temperature(4, 30, False)
 
 
-	def browse_files(self):
-		file = tkinter.filedialog.asksaveasfile(initialfile='thermocycler_protocol.txt', initialdir = './', title="Save Protocol to File")
+	def browse_files(self, default_file_name='thermocycler_protocol.txt'):
+		file = tkinter.filedialog.asksaveasfile(initialfile=default_file_name, initialdir = './', title="Save Protocol to File")
 		return file
 
 	def import_thermocyclers(self) -> None:
@@ -1344,6 +1553,7 @@ Times:
 				print(f"{label_text}: up")
 
 	def on_closing(self, event=0) -> None:
+		self.server.stop()
 		self.destroy()
 
 	def backwards(self, event):
@@ -1372,6 +1582,11 @@ Times:
 		self.upper_gantry.move_relative('down', dz)
 
 	def load_status_xlsx(self):
+		#status_url = r'https://biorad-my.sharepoint.com/:x:/r/personal/u112958_global_bio-rad_com/_layouts/15/Doc.aspx?sourcedoc=%7B0F23CBA7-8FD0-4246-B5F1-F3D53E68AAED%7D&file=unit_component_statuses.xlsx&action=default&mobileredirect=true'
+		#ctx_auth = AuthenticationContext(status_url)
+		#ctx_auth.acquire_token_for_user('u112958@bio-rad.com', 'G7aa-2x4-8')
+		#ctx = ClientContext(status_url, ctx_auth)
+		#response = File.open_binary(ctx, "")
 		unit = f"Unit {self.settings_unit_sv.get()}"
 		df = pd.read_excel('unit_component_statuses.xlsx', sheet_name=unit)
 		for index, row in df.iterrows():
@@ -1379,6 +1594,10 @@ Times:
 			self.status_treeview_row_index = self.status_treeview_row_index + 1
 
 if __name__ == '__main__':
+	# Start up the uvicorn server
+	#uvicorn.run('main:app', app_dir=r'C:\fastapi\app', reload=True, workers=1, limit_concurrency=1)
+	#config = uvicorn.Config('main:app', app_dir=r'C:\fastapi\app', reload=True, workers=1, limit_concurrency=1)
+	#uvicorn.Config()
 	app = App()
 	app.iconbitmap('bio-rad-logo.ico')
 	app.bind('<Return>', app.enter)
@@ -1391,3 +1610,4 @@ if __name__ == '__main__':
 	app.maxsize(780,520)
 	app.minsize(780,520)
 	app.mainloop()
+	#uvicorn.Server.shutdown()
