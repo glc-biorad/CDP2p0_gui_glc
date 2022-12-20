@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.8
 
+from cmath import nan
 import pythonnet
 from pythonnet import load
 
@@ -244,11 +245,14 @@ class App(ctk.CTk):
 			self.label_thermocycler.place(x=310, y=5) 
 			self.label_thermocycler.bind('<Button-1>', self.on_click)
 			self.button_start_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Start', command=self.start_thermocyclers)
-			self.button_start_thermocyclers.place(x=5, y=445, width=100)
+			self.button_start_thermocyclers.place(x=5, y=435, width=100)
 			self.button_import = ctk.CTkButton(master=self.frame_right, text='Import', command=self.import_thermocyclers)
-			self.button_import.place(x=115, y=445, width=95)
+			self.button_import.place(x=115, y=435, width=95)
 			self.button_export = ctk.CTkButton(master=self.frame_right, text='Export', command=self.export_thermocyclers)
-			self.button_export.place(x=215, y=445, width=95) 
+			self.button_export.place(x=215, y=435, width=95) 
+			# Progress Bar
+			self.progressbar_thermocyclers = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', mode='determinate', length = 270)
+			self.progressbar_thermocyclers.place(x=20,y=475)
 			#fig = Figure(figsize=(3,2.4))
 			#a = fig.add_subplot(111)
 			#data = np.array([92,92,55,55,84,84])
@@ -576,9 +580,9 @@ class App(ctk.CTk):
 			# Unit F Status
 			# Treeview
 			self.scrollbar_treeview_status = tkinter.Scrollbar(self.frame_right, orient='horizontal')
-			self.treeview_status = tkinter.ttk.Treeview(self.frame_right, columns=('Component', "Parent Module", 'Status', 'Priority', 'Note', "Fix By", "Fix By Date", 'Contact', "FW Version"), show='headings', xscrollcommand=self.scrollbar_treeview_status.set)
+			self.treeview_status = tkinter.ttk.Treeview(self.frame_right, columns=('Component', "Parent Module", 'Status', 'Priority', 'Note', "Fix By Date", 'Contact', "FW Version"), show='headings', xscrollcommand=self.scrollbar_treeview_status.set)
 			self.scrollbar_treeview_status.config(command=self.treeview_status.xview)
-			self.treeview_status.column('Component', width=130, stretch=False)
+			self.treeview_status.column('Component', width=200, stretch=False)
 			self.treeview_status.heading('Component', text='Component')
 			self.treeview_status.column("Parent Module", width=100, stretch=False)
 			self.treeview_status.heading("Parent Module", text="Parent Module")
@@ -678,6 +682,7 @@ class App(ctk.CTk):
 		thread.start()
 
 	def start_protocol(self):
+		self.__update_build_protocol_action_list()
 		n_tasks = len(self.build_protocol_action_list)
 		i = 0
 		for row in self.treeview_build_protocol.get_children():
@@ -783,19 +788,25 @@ class App(ctk.CTk):
 			elif "Disengage Magnet" in action_msg:
 				self.upper_gantry.disengage_magnet()
 			elif "Move Relative Up" in action_msg:
-				self.upper_gantry.move_relative('up', self.dz, velocity='fast')
+				delta = int(action_msg.split()[-2])
+				self.upper_gantry.move_relative('up', delta, velocity='fast')
 			elif "Move Relative Down" in action_msg:
-				self.upper_gantry.move_relative('down', self.dz, velocity='fast')
+				delta = int(action_msg.split()[-2])
+				self.upper_gantry.move_relative('down', delta, velocity='fast')
 			elif "Move Relative Left" in action_msg:
-				self.upper_gantry.move_relative('left', self.dx, velocity='fast')
+				delta = int(action_msg.split()[-2])
+				self.upper_gantry.move_relative('left', delta, velocity='fast')
 			elif "Move Relative Right" in action_msg:
-				self.upper_gantry.move_relative('right', self.dx, velocity='fast')
+				delta = int(action_msg.split()[-2])
+				self.upper_gantry.move_relative('right', delta, velocity='fast')
 			elif "Move Relative Backwards" in action_msg:
-				self.upper_gantry.move_relative('backwards', self.dy, velocity='fast')
+				delta = int(action_msg.split()[-2])
+				self.upper_gantry.move_relative('backwards', delta, velocity='fast')
 			elif "Move Relative Forwards" in action_msg:
-				self.upper_gantry.move_relative('forwards', self.dy, velocity='fast')
+				delta = int(action_msg.split()[-2])
+				self.upper_gantry.move_relative('forwards', delta, velocity='fast')
 			# Update the progress bar for the protocol
-			self.progressbar_build_protocol['value'] = int((i+1) / n_tasks * 100)
+			self.progressbar_build_protocol['value'] = int((i+1) / (n_tasks)) * 100
 			i = i + 1
 		self.button_build_protocol_start.configure(state=tkinter.NORMAL)
 		print('start protocol')
@@ -936,6 +947,18 @@ class App(ctk.CTk):
 
 	def build_protocol_other_add(self):
 		action_msg = self.build_protocol_other_sv.get()
+		if 'Up' in action_msg:
+			action_msg = action_msg + f" by {self.dz} usteps"
+		elif 'Down' in action_msg:
+			action_msg = action_msg + f" by {self.dz} usteps"
+		elif 'Left' in action_msg:
+			action_msg = action_msg + f" by {self.dx} usteps"
+		elif 'Right' in action_msg:
+			action_msg = action_msg + f" by {self.dx} usteps"
+		elif 'Backwards' in action_msg:
+			action_msg = action_msg + f" by {self.dy} usteps"
+		elif 'Forwards' in action_msg:
+			action_msg = action_msg + f" by {self.dy} usteps"
 		self.build_protocol_add(action_msg)
 
 	def update_coordinate(self):
@@ -1014,6 +1037,7 @@ Times:
 ------------------------------------------------------""")
 		# Start timers for the thermocyclers
 		# Start a thread
+		self.progressbar_thermocyclers['value'] = 0
 		thread = threading.Thread(target=self.thermocycle)
 		thread.start()
 
@@ -1052,6 +1076,7 @@ Times:
 		# Denature
 		time_start = time.time()
 		meersetter = Meerstetter()
+		self.progressbar_thermocyclers['value'] = 10
 		if self.checkbox_thermocycler_A.get():
 			meersetter.change_temperature(1, denature_temperature_A, False)
 		if self.checkbox_thermocycler_B.get():
@@ -1062,11 +1087,11 @@ Times:
 			meersetter.change_temperature(4, denature_temperature_D, False)
 		for sec in range(int(denature_time_A * 60)):
 			time.sleep(1)
-		print('done')
 		# Thermocycle
 		cycles = [i for i in range(self.thermocyclers['cycles']['A'])]
 		for cycle in cycles:
-			print(f"Cycle Number: {cycle}/{len(cycles)}")
+			print(f"Cycle Number: {cycle+1}/{len(cycles)}")
+			self.progressbar_thermocyclers['value'] = 100 * (cycle+1) / len(cycles) - 10
 			if self.checkbox_thermocycler_A.get():
 				meersetter.change_temperature(1, extension_temperature_A, False)
 			if self.checkbox_thermocycler_B.get():
@@ -1075,7 +1100,7 @@ Times:
 				meersetter.change_temperature(3, extension_temperature_C, False)
 			if self.checkbox_thermocycler_D.get():
 				meersetter.change_temperature(4, extension_temperature_D, False)
-			for sec in range(int(denature_time_A * 60)):
+			for sec in range(int(denature_time_A)):
 				time.sleep(1)
 			if self.checkbox_thermocycler_A.get():
 				meersetter.change_temperature(1, anneal_temperature_A, False)
@@ -1085,7 +1110,7 @@ Times:
 				meersetter.change_temperature(3, anneal_temperature_C, False)
 			if self.checkbox_thermocycler_D.get():
 				meersetter.change_temperature(4, anneal_temperature_D, False)
-			for sec in range(int(denature_time_A * 60)):
+			for sec in range(int(denature_time_A)):
 				time.sleep(1)
 		# End temperatue
 		if self.checkbox_thermocycler_A.get():
@@ -1096,6 +1121,9 @@ Times:
 			meersetter.change_temperature(3, 30, False)
 		if self.checkbox_thermocycler_D.get():
 			meersetter.change_temperature(4, 30, False)
+		# Thermocycling is done.
+		self.progressbar_thermocyclers['value'] = 100
+
 
 
 	def browse_files(self, default_file_name='thermocycler_protocol.txt'):
@@ -1104,36 +1132,6 @@ Times:
 
 	def import_thermocyclers(self) -> None:
 		a = 1
-
-	def test1(self):
-		payload = PeltierPayload('get', 1000)
-		address = 1
-		pcom = PeltierCommunication('#', 1, 1, payload,None)
-		self.__controller.write(pcom.to_string())
-		#self.__increase_sequence_number(address)
-        # Get the response back.
-		response = self.__controller.readline()
-        # Compare the response.
-        #pcom.compare_with_response(response, assert_checksum=False)
-        # Get the object temperature from the response.
-		temperature_hexidecimal = response[7:-4]
-		temperature = convert_hexidecimal_to_float32_ieee_754(temperature_hexidecimal)
-		print(temperature)
-
-	def test2(self):
-		payload = PeltierPayload('get', 1000)
-		address = 2
-		pcom = PeltierCommunication('#', 2, 1, payload,None)
-		self.__controller.write(pcom.to_string())
-		#self.__increase_sequence_number(address)
-        # Get the response back.
-		response = self.__controller.readline()
-        # Compare the response.
-        #pcom.compare_with_response(response, assert_checksum=False)
-        # Get the object temperature from the response.
-		temperature_hexidecimal = response[7:-4]
-		temperature = convert_hexidecimal_to_float32_ieee_754(temperature_hexidecimal)
-		print(temperature)
 
 	def export_thermocyclers(self):
 		t1 = threading.Thread(target=self.test1)
@@ -1145,15 +1143,12 @@ Times:
 		fig = Figure(figsize=(3,2.4))
 		fig.set_facecolor((43/255, 43/255, 43/255))
 		a = fig.add_subplot(111)
-		#data = np.array([92,92,55,55,84,84])
 		x = np.array([1,2,3,4,5,6])
 		a.set_yticks([data[0],data[2],data[4]])
 		a.set_xticks([])
 		a.axvline(x=2.5)
 		a.axvline(x=4.5)
 		a.set_facecolor((43/255,43/255, 43/255))
-		#a.yaxis.label.set_color('white')
-		#a.xaxis.label.set_color('white')
 		a.tick_params(color='white', labelcolor='white')
 		for pos in ['top', 'bottom', 'left', 'right']:
 			a.spines[pos].set_edgecolor('white')
@@ -1168,13 +1163,6 @@ Times:
 		self.label_thermocycler_anneal.place(x=135, y=120, width=60)
 		self.label_thermocycler_extension = ctk.CTkLabel(master=self.frame_right, text_color='white', text='2nd Denature', font=("Roboto Light", -12))
 		self.label_thermocycler_extension.place(x=195, y=120, width=100)
-		#self.plot_thermocycler(self.thermocycler['temperatures']['A'])
-		#self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Denature', font=("Roboto Light",-16))
-		#self.label_thermocycler_denature.place(x=10, y=120, width=100)
-		#self.label_thermocycler_anneal = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Anneal', font=("Roboto Light", -16))
-		#self.label_thermocycler_anneal.place(x=110, y=120, width=100)
-		#self.label_thermocycler_extension = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Extension', font=("Roboto Light", -16))
-		#self.label_thermocycler_extension.place(x=210, y=120, width=100)
 
 	def on_click(self, event):
 		x,y = event.x, event.y
@@ -1490,13 +1478,57 @@ Times:
 						column_options.set('7')
 					elif x >= 177 and x <= 186:
 						column_options.set('8')
-				# Reagent Cartridge
-
 				# Chiller
 				# Pre-Amp Thermocycler
+				if x >= 39 and x <= 158 and y >= 34 and y <= 119:
+					consumable_options.set("Pre-Amp Thermocycler")
+					tray_options.set('')
+					if x >= 39 and x <= 50:
+						column_options.set('1')
+					elif x >= 51 and x <= 60:
+						column_options.set('2')
+					elif x >= 61 and x <= 69:
+						column_options.set('3')
+					elif x >= 70 and x <= 78:
+						column_options.set('4')
+					elif x >= 79 and x <= 89:
+						column_options.set('5')
+					elif x >= 90 and x <= 97:
+						column_options.set('6')
+					elif x >= 98 and x <= 107:
+						column_options.set('7')
+					elif x >= 108 and x <= 118:
+						column_options.set('8')
+					elif x >= 119 and x <= 127:
+						column_options.set('9')
+					elif x >= 128 and x <= 136:
+						column_options.set('10')
+					elif x >= 136 and x <= 146:
+						column_options.set('11')
+					elif x >= 147 and x <= 158:
+						column_options.set('12')
 				# Lid Tray
 				# Tip Transfer Tray
 				# Assay Strip
+				if x >= 7 and x <= 98 and y >= 346 and y <= 424:
+					consumable_options.set("Assay Strip")
+					tray_options.set('')
+					if x >= 7 and x <= 16:
+						column_options.set('1')
+					elif x >= 17 and x <= 25:
+						column_options.set('2')
+					elif x >= 31 and x <= 41:
+						column_options.set('3')
+					elif x >= 42 and x <= 50:
+						column_options.set('4')
+					elif x >= 56 and x <= 66:
+						column_options.set('5')
+					elif x >= 67 and x <= 74:
+						column_options.set('6')
+					elif x >= 80 and x <= 89:
+						column_options.set('7')
+					elif x >= 90 and x <= 99:
+						column_options.set('8')
 				# Update the option menus
 				self.optionmenu_consumable.configure(variable=consumable_options)
 				self.optionmenu_tray.configure(variable=tray_options)
@@ -1614,31 +1646,31 @@ Times:
 		self.destroy()
 
 	def backwards(self, event):
-		dy = int(self.entry_settings_dy.get())
+		dy = int(self.dy.get())
 		self.upper_gantry.move_relative('backwards', dy)
 
 	def left(self, event):
-		dx = int(self.entry_settings_dx.get())
+		dx = int(self.dx.get())
 		self.upper_gantry.move_relative('left', dx)
 
 	def forwards(self, event):
-		dy = int(self.entry_settings_dy.get())
+		dy = int(self.dy.get())
 		self.upper_gantry.move_relative('forwards', dy)
 
 	def right(self, event):
-		dx = int(self.entry_settings_dx.get())
+		dx = int(self.dx.get())
 		self.upper_gantry.move_relative('right', dx)
 
 	def up(self, event):
-		print("HERE")
-		dz = int(self.entry_settings_dz.get())
+		dz = int(self.dz.get())
 		self.upper_gantry.move_relative('up', dz)
 
 	def down(self, event):
-		dz = int(self.entry_settings_dz.get())
+		dz = int(self.dz.get())
 		self.upper_gantry.move_relative('down', dz)
 
 	def load_status_xlsx(self):
+		import math
 		#status_url = r'https://biorad-my.sharepoint.com/:x:/r/personal/u112958_global_bio-rad_com/_layouts/15/Doc.aspx?sourcedoc=%7B0F23CBA7-8FD0-4246-B5F1-F3D53E68AAED%7D&file=unit_component_statuses.xlsx&action=default&mobileredirect=true'
 		#ctx_auth = AuthenticationContext(status_url)
 		#ctx_auth.acquire_token_for_user('u112958@bio-rad.com', 'G7aa-2x4-8')
@@ -1647,7 +1679,29 @@ Times:
 		unit = f"Unit {self.settings_unit_sv.get()}"
 		df = pd.read_excel('unit_component_statuses.xlsx', sheet_name=unit)
 		for index, row in df.iterrows():
-			self.treeview_status.insert('', 'end', 'row{0}'.format(self.status_treeview_row_index), values=(row['Component'],row["Parent Module"], row['Status'], row['Priority'], row['Note'], row["Fix By Date"], row['Contact'],))
+			cmpt = row['Component']
+			pm = row["Parent Module"]
+			s = row['Status']
+			p = row['Priority']
+			try:
+				if math.isnan(p):
+					p = ''
+			except:
+				pass
+			n = row['Note']
+			try:
+				if math.isnan(n):
+					n = ''
+			except:
+				pass
+			fbd = row["Fix By Date"]
+			c = row['Contact']
+			try:
+				if math.isnan(c):
+					c = ''
+			except:
+				pass
+			self.treeview_status.insert('', 'end', 'row{0}'.format(self.status_treeview_row_index), values=(cmpt, pm, s, p, n, fbd, c,))
 			self.status_treeview_row_index = self.status_treeview_row_index + 1
 
 if __name__ == '__main__':
