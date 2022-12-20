@@ -1,16 +1,16 @@
 #!/usr/bin/env python3.8
 
-#import pythonnet
-#from pythonnet import load
+import pythonnet
+from pythonnet import load
 
-#load("coreclr")
+load("coreclr")
 
-#from utils import delay
-#from script import Script
-#from upper_gantry import UpperGantry
-#from meerstetter import Meerstetter
-#from fast_api_interface import FastAPIInterface
-#from uvicorn_server import UvicornServer
+from utils import delay
+from script import Script
+from upper_gantry import UpperGantry
+from meerstetter import Meerstetter
+from fast_api_interface import FastAPIInterface
+from uvicorn_server import UvicornServer
 
 # Needed to do for pandas:
 # python3.8 -m pip install openpyxl
@@ -34,9 +34,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 # Import Office365 for using SharePoint
-#from office365.runtime.auth.authentication_context import AuthenticationContext
-#from office365.sharepoint.client_context import ClientContext
-#from office365.sharepoint.files.file import File
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
+from office365.sharepoint.files.file import File
 
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('green')
@@ -98,11 +98,11 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
-		self.server = None #UvicornServer()
-		#self.server.start()
-		self.script = None #Script()
-		self.upper_gantry = None #UpperGantry()
-		self.fast_api_interface = None #FastAPIInterface()
+		self.server = UvicornServer()
+		self.server.start()
+		self.script = Script()
+		self.upper_gantry = UpperGantry()
+		self.fast_api_interface = FastAPIInterface()
 
 		self.use_z = tkinter.IntVar()
 		self.use_z.set(1)
@@ -954,7 +954,7 @@ class App(ctk.CTk):
 		self.dz.set(self.entry_settings_dz.get())
 
 	def start_thermocyclers(self) -> None:
-		# Create a file for logging.
+		# Create a file for logging.\
 		file = self.browse_files()
 		file.write(f"""------------------------------------------------------
 Thermocycler Protocol
@@ -1052,10 +1052,14 @@ Times:
 		# Denature
 		time_start = time.time()
 		meersetter = Meerstetter()
-		meersetter.change_temperature(1, denature_temperature_A, False)
-		meersetter.change_temperature(2, denature_temperature_B, False)
-		#meersetter.change_temperature(3, denature_temperature_C, False)
-		meersetter.change_temperature(4, denature_temperature_D, False)
+		if self.checkbox_thermocycler_A.get():
+			meersetter.change_temperature(1, denature_temperature_A, False)
+		if self.checkbox_thermocycler_B.get():
+			meersetter.change_temperature(2, denature_temperature_B, False)
+		if self.checkbox_thermocycler_C.get():
+			meersetter.change_temperature(3, denature_temperature_C, False)
+		if self.checkbox_thermocycler_D.get():
+			meersetter.change_temperature(4, denature_temperature_D, False)
 		for sec in range(int(denature_time_A * 60)):
 			time.sleep(1)
 		print('done')
@@ -1063,34 +1067,34 @@ Times:
 		cycles = [i for i in range(self.thermocyclers['cycles']['A'])]
 		for cycle in cycles:
 			print(f"Cycle Number: {cycle}/{len(cycles)}")
-			if self.checkbox_thermocycler_A:
+			if self.checkbox_thermocycler_A.get():
 				meersetter.change_temperature(1, extension_temperature_A, False)
-			if self.checkbox_thermocycler_B:
+			if self.checkbox_thermocycler_B.get():
 				meersetter.change_temperature(2, extension_temperature_B, False)
-			if self.checkbox_thermocycler_C:
+			if self.checkbox_thermocycler_C.get():
 				meersetter.change_temperature(3, extension_temperature_C, False)
-			if self.checkbox_thermocycler_D:
+			if self.checkbox_thermocycler_D.get():
 				meersetter.change_temperature(4, extension_temperature_D, False)
 			for sec in range(int(denature_time_A * 60)):
 				time.sleep(1)
-			if self.checkbox_thermocycler_A:
+			if self.checkbox_thermocycler_A.get():
 				meersetter.change_temperature(1, anneal_temperature_A, False)
-			if self.checkbox_thermocycler_B:
+			if self.checkbox_thermocycler_B.get():
 				meersetter.change_temperature(2, anneal_temperature_B, False)
-			if self.checkbox_thermocycler_C:
+			if self.checkbox_thermocycler_C.get():
 				meersetter.change_temperature(3, anneal_temperature_C, False)
-			if self.checkbox_thermocycler_D:
+			if self.checkbox_thermocycler_D.get():
 				meersetter.change_temperature(4, anneal_temperature_D, False)
 			for sec in range(int(denature_time_A * 60)):
 				time.sleep(1)
 		# End temperatue
-		if self.checkbox_thermocycler_A:
+		if self.checkbox_thermocycler_A.get():
 			meersetter.change_temperature(1, 30, False)
-		if self.checkbox_thermocycler_B:
+		if self.checkbox_thermocycler_B.get():
 			meersetter.change_temperature(2, 30, False)
-		if self.checkbox_thermocycler_C:
+		if self.checkbox_thermocycler_C.get():
 			meersetter.change_temperature(3, 30, False)
-		if self.checkbox_thermocycler_D:
+		if self.checkbox_thermocycler_D.get():
 			meersetter.change_temperature(4, 30, False)
 
 
@@ -1568,14 +1572,18 @@ Times:
 		time_denature = int(self.entry_clock_denature.get())
 		time_anneal = int(self.entry_clock_anneal.get())
 		time_extension = int(self.entry_clock_extension.get())
-		self.thermocyclers['times'][thermocycler]['denature'] = time_denature
-		self.thermocyclers['times'][thermocycler]['anneal'] = time_anneal
-		self.thermocyclers['times'][thermocycler]['extension'] = time_extension
+		thermocyclers = ['A', 'B', 'C', 'D']
+		for thermocycler in thermocyclers:
+			self.thermocyclers['times'][thermocycler]['denature'] = time_denature
+			self.thermocyclers['times'][thermocycler]['anneal'] = time_anneal
+			self.thermocyclers['times'][thermocycler]['extension'] = time_extension
 
 	def callback_thermocycler_cycles(self, event):
 		thermocycler = self.optionmenu_thermocycler.cget('variable').get()
 		cycles = int(self.entry_thermocycler_cycles.get())
-		self.thermocyclers['cycles'][thermocycler] = cycles
+		thermocyclers = ['A', 'B', 'C', 'D']
+		for thermocycler in thermocyclers:
+			self.thermocyclers['cycles'][thermocycler] = cycles
 
 	def callback_clamp_A_max(self, event):
 		self.clamp_A_max.set(self.entry_settings_clamp_A.get())
@@ -1643,10 +1651,6 @@ Times:
 			self.status_treeview_row_index = self.status_treeview_row_index + 1
 
 if __name__ == '__main__':
-	# Start up the uvicorn server
-	#uvicorn.run('main:app', app_dir=r'C:\fastapi\app', reload=True, workers=1, limit_concurrency=1)
-	#config = uvicorn.Config('main:app', app_dir=r'C:\fastapi\app', reload=True, workers=1, limit_concurrency=1)
-	#uvicorn.Config()
 	app = App()
 	app.iconbitmap('bio-rad-logo.ico')
 	app.bind('<Return>', app.enter)
@@ -1659,4 +1663,3 @@ if __name__ == '__main__':
 	app.maxsize(780,520)
 	app.minsize(780,520)
 	app.mainloop()
-	#uvicorn.Server.shutdown()
