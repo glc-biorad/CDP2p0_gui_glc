@@ -1,16 +1,16 @@
 #!/usr/bin/env python3.8
 
-import pythonnet
-from pythonnet import load
+#import pythonnet
+#from pythonnet import load
 
-load("coreclr")
+#load("coreclr")
 
-from utils import delay
-from script import Script
-from upper_gantry import UpperGantry
-from meerstetter import Meerstetter
-from fast_api_interface import FastAPIInterface
-from uvicorn_server import UvicornServer
+#from utils import delay
+#from script import Script
+#from upper_gantry import UpperGantry
+#from meerstetter import Meerstetter
+#from fast_api_interface import FastAPIInterface
+#from uvicorn_server import UvicornServer
 
 # Needed to do for pandas:
 # python3.8 -m pip install openpyxl
@@ -34,9 +34,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 # Import Office365 for using SharePoint
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
-from office365.sharepoint.files.file import File
+#from office365.runtime.auth.authentication_context import AuthenticationContext
+#from office365.sharepoint.client_context import ClientContext
+#from office365.sharepoint.files.file import File
 
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('green')
@@ -58,16 +58,16 @@ class App(ctk.CTk):
 			'CD': True, # True (Open, homed), False (Closed),
 			},
 		'temperatures': {
-			'A': np.array([84,84, 55, 55, 84, 84]),
-			'B': np.array([84,84, 60, 60, 84, 84]),
-			'C': np.array([84,84, 55, 55, 84, 84]),
-			'D': np.array([84,84, 55, 55, 84, 84]),
+			'A': np.array([84,84, 50, 50, 84, 84]),
+			'B': np.array([84,84, 50, 50, 84, 84]),
+			'C': np.array([84,84, 50, 50, 84, 84]),
+			'D': np.array([84,84, 50, 50, 84, 84]),
 			},
 		'times': {
-			'A': {'denature': 5, 'anneal': 80, 'extension': 40},
-			'B': {'denature': 10, 'anneal': 80, 'extension': 40},
-			'C': {'denature': 5, 'anneal': 80, 'extension': 40},
-			'D': {'denature': 5, 'anneal': 80, 'extension': 40},
+			'A': {'denature': 3, 'anneal': 40, 'extension': 30},
+			'B': {'denature': 3, 'anneal': 40, 'extension': 30},
+			'C': {'denature': 3, 'anneal': 40, 'extension': 30},
+			'D': {'denature': 3, 'anneal': 40, 'extension': 30},
 			},
 		'trays': {
 			'AB': {'homed': True},
@@ -80,10 +80,10 @@ class App(ctk.CTk):
 			'D': {'homed': True},
 			},
 		'cycles': {
-			'A': 45,
-			'B': 45,
-			'C': 45,
-			'D': 45,
+			'A': 40,
+			'B': 40,
+			'C': 40,
+			'D': 40,
 			},
 		}
 	thermocycler_dict = {
@@ -98,11 +98,11 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
-		self.server = UvicornServer()
-		self.server.start()
-		self.script = Script()
-		self.upper_gantry = UpperGantry()
-		self.fast_api_interface = FastAPIInterface()
+		self.server = None #UvicornServer()
+		#self.server.start()
+		self.script = None #Script()
+		self.upper_gantry = None #UpperGantry()
+		self.fast_api_interface = None #FastAPIInterface()
 
 		self.use_z = tkinter.IntVar()
 		self.use_z.set(1)
@@ -130,6 +130,14 @@ class App(ctk.CTk):
 		self.heater_shaker_rpm.set('1300')
 		self.settings_unit_sv = StringVar()
 		self.settings_unit_sv.set('A')
+		self.use_thermocycler_A = tkinter.IntVar()
+		self.use_thermocycler_A.set(1)
+		self.use_thermocycler_B = tkinter.IntVar()
+		self.use_thermocycler_B.set(1)
+		self.use_thermocycler_C = tkinter.IntVar()
+		self.use_thermocycler_C.set(0)
+		self.use_thermocycler_D = tkinter.IntVar()
+		self.use_thermocycler_D.set(1)
 
 		# Volume in tips
 		self.pipettor_current_volume = 0
@@ -254,12 +262,12 @@ class App(ctk.CTk):
 			#canvas.get_tk_widget().place(x=10, y=120)
 			#canvas.draw()
 			self.plot_thermocycler(self.thermocyclers['temperatures']['A'])
-			self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, text_color='white', text='Denature', font=("Roboto Light",-16))
-			self.label_thermocycler_denature.place(x=10, y=120, width=100)
-			self.label_thermocycler_anneal = ctk.CTkLabel(master=self.frame_right, text_color='white', text='Anneal', font=("Roboto Light", -16))
-			self.label_thermocycler_anneal.place(x=110, y=120, width=100)
-			self.label_thermocycler_extension = ctk.CTkLabel(master=self.frame_right, text_color='white', text='Extension', font=("Roboto Light", -16))
-			self.label_thermocycler_extension.place(x=210, y=120, width=100)
+			self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, text_color='white', text='1st Denature', font=("Roboto Light",-12))
+			self.label_thermocycler_denature.place(x=35, y=120, width=100)
+			self.label_thermocycler_anneal = ctk.CTkLabel(master=self.frame_right, text_color='white', text='Anneal', font=("Roboto Light", -12))
+			self.label_thermocycler_anneal.place(x=135, y=120, width=60)
+			self.label_thermocycler_extension = ctk.CTkLabel(master=self.frame_right, text_color='white', text='2nd Denature', font=("Roboto Light", -12))
+			self.label_thermocycler_extension.place(x=195, y=120, width=100)
 			image = Image.open('thermostat.png').resize((24,24))
 			self.img_thermostat = ImageTk.PhotoImage(image)
 			self.label_thermostat = ctk.CTkLabel(master=self.frame_right, text='', bg_color='white', image=self.img_thermostat)
@@ -311,6 +319,23 @@ class App(ctk.CTk):
 			self.label_units_denature_time.place(x=107, y=395)
 			self.label_units_anneal_time.place(x=187, y=395)
 			self.label_units_extension_time.place(x=267, y=395)
+			# Thermocycler Checkboxes
+			self.label_thermocycler_A = ctk.CTkLabel(master=self.frame_right, text='A', font=("Roboto Medium", -12))
+			self.label_thermocycler_A.place(x=320, y=475)
+			self.checkbox_thermocycler_A = ctk.CTkCheckBox(master=self.frame_right, variable=self.use_thermocycler_A, onvalue=1, offvalue=0, text='')
+			self.checkbox_thermocycler_A.place(x=340, y=475)
+			self.label_thermocycler_B = ctk.CTkLabel(master=self.frame_right, text='B', font=("Roboto Medium", -12))
+			self.label_thermocycler_B.place(x=380, y=475)
+			self.checkbox_thermocycler_B = ctk.CTkCheckBox(master=self.frame_right, variable=self.use_thermocycler_B, onvalue=1, offvalue=0, text='')
+			self.checkbox_thermocycler_B.place(x=400, y=475)
+			self.label_thermocycler_C = ctk.CTkLabel(master=self.frame_right, text='C', font=("Roboto Medium", -12))
+			self.label_thermocycler_C.place(x=440, y=475)
+			self.checkbox_thermocycler_C = ctk.CTkCheckBox(master=self.frame_right, variable=self.use_thermocycler_C, onvalue=1, offvalue=0, text='')
+			self.checkbox_thermocycler_C.place(x=460, y=475)
+			self.label_thermocycler_D = ctk.CTkLabel(master=self.frame_right, text='D', font=("Roboto Medium", -12))
+			self.label_thermocycler_D.place(x=500, y=475)
+			self.checkbox_thermocycler_D = ctk.CTkCheckBox(master=self.frame_right, variable=self.use_thermocycler_D, onvalue=1, offvalue=0, text='')
+			self.checkbox_thermocycler_D.place(x=520, y=475)
 		elif button_text == "Build Protocol":
 			#self.radiobutton_script_builder_iv = tkinter.IntVar(0)
 			#self.radiobutton_script_builder = ctk.CTkRadioButton(master=self.frame_right, text="Script Builder", variable=self.radiobutton_script_builder_iv, command=self.script_builder_radiobutton_event)
@@ -449,26 +474,29 @@ class App(ctk.CTk):
 			self.label_build_protocol_time_add.place(x=297, y=250)
 			self.button_build_protocol_other_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_other_add, fg_color='#4C7BD3') 
 			self.button_build_protocol_other_add.place(x=290, y=280, width=40)
+			# Progress Bar
+			self.progressbar_build_protocol = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', length=195, mode = 'determinate')
+			self.progressbar_build_protocol.place(x=350,y=285)
 			# Start
 			self.button_build_protocol_start = ctk.CTkButton(master=self.frame_right, text='Start', command=self.build_protocol_start, fg_color='#4C7BD3')
-			self.button_build_protocol_start.place(x=360, y=195, width=165)
+			self.button_build_protocol_start.place(x=380, y=340, width=165)
 			# Import
 			self.button_build_protocol_import = ctk.CTkButton(master=self.frame_right, text='Import', command=self.build_protocol_import)
-			self.button_build_protocol_import.place(x=360, y=225, width=165)
+			self.button_build_protocol_import.place(x=380, y=370, width=165)
 			# Export
 			self.button_build_protocol_export = ctk.CTkButton(master=self.frame_right, text='Export', command=self.build_protocol_export)
-			self.button_build_protocol_export.place(x=360, y=255, width=165)
+			self.button_build_protocol_export.place(x=380, y=400, width=165)
 			# Delete 
 			self.button_build_protocol_delete = ctk.CTkButton(master=self.frame_right, text='Delete', command=self.build_protocol_delete, fg_color='#b81414')
-			self.button_build_protocol_delete.place(x=360, y=285, width=165)
+			self.button_build_protocol_delete.place(x=380, y=430, width=165)
 			# Treeview
 			self.scrollbar_treeview_build_protocol = tkinter.Scrollbar(self.frame_right, orient='horizontal')
 			self.treeview_build_protocol = tkinter.ttk.Treeview(self.frame_right, columns=('Action'), show='headings', xscrollcommand=self.scrollbar_treeview_build_protocol.set)
 			self.scrollbar_treeview_build_protocol.config(command=self.treeview_build_protocol.xview)
-			self.treeview_build_protocol.column('Action', width=550, stretch=False)
+			self.treeview_build_protocol.column('Action', width=360, stretch=False)
 			self.treeview_build_protocol.heading('Action', text='Action')
-			self.treeview_build_protocol.place(x=5,y=320, width=550, height=160)
-			self.scrollbar_treeview_build_protocol.place(x=5, y=480, width=550)
+			self.treeview_build_protocol.place(x=5,y=320, width=360, height=160)
+			self.scrollbar_treeview_build_protocol.place(x=5, y=480, width=360)
 			self.treeview_build_protocol.bind('<Double-Button-1>', self.on_click)
 			self.__fill_build_protocol_treeview()
 		elif button_text == 'Optimize':
@@ -508,6 +536,8 @@ class App(ctk.CTk):
 			self.checkbox_slow_z = ctk.CTkCheckBox(master=self.frame_right, text="Slow Z", variable=self.slow_z, onvalue=1, offvalue=0)
 			self.checkbox_slow_z.place(x=210, y=70, width=100)
 			# Home buttons
+			self.button_home = ctk.CTkButton(master=self.frame_right, text='Home', font=("Roboto Medium", -16), width=60, command=self.home_pipettor, height=45)
+			self.button_home.place(x=340, y=45)
 			self.button_home_z = ctk.CTkButton(master=self.frame_right, text="Home Z", font=("Roboto Medium", -12), width=60, command=self.home_pipettor_z)
 			self.button_home_z.place(x=120, y=470)
 			self.button_home_y = ctk.CTkButton(master=self.frame_right, text="Home Y", font=("Roboto Medium", -12), width=60, command=self.home_pipettor_y)
@@ -648,6 +678,8 @@ class App(ctk.CTk):
 		thread.start()
 
 	def start_protocol(self):
+		n_tasks = len(self.build_protocol_action_list)
+		i = 0
 		for row in self.treeview_build_protocol.get_children():
 			self.treeview_build_protocol.selection_set(row)
 			action_msg = self.treeview_build_protocol.item(row)['values'][0]
@@ -762,6 +794,9 @@ class App(ctk.CTk):
 				self.upper_gantry.move_relative('backwards', self.dy, velocity='fast')
 			elif "Move Relative Forwards" in action_msg:
 				self.upper_gantry.move_relative('forwards', self.dy, velocity='fast')
+			# Update the progress bar for the protocol
+			self.progressbar_build_protocol['value'] = int((i+1) / n_tasks * 100)
+			i = i + 1
 		self.button_build_protocol_start.configure(state=tkinter.NORMAL)
 		print('start protocol')
 
@@ -791,6 +826,8 @@ class App(ctk.CTk):
 		except:
 			pass
 
+	def home_pipettor(self):
+		self.upper_gantry.home_pipettor()
 	def home_pipettor_z(self):
 		self.fast_api_interface.pipettor_gantry.axis.home('pipettor_gantry', 3, False, True)
 	def home_pipettor_y(self):
@@ -1026,23 +1063,35 @@ Times:
 		cycles = [i for i in range(self.thermocyclers['cycles']['A'])]
 		for cycle in cycles:
 			print(f"Cycle Number: {cycle}/{len(cycles)}")
-			meersetter.change_temperature(1, extension_temperature_A, False)
-			meersetter.change_temperature(2, extension_temperature_B, False)
-			#meersetter.change_temperature(3, extension_temperature_C, False)
-			meersetter.change_temperature(4, extension_temperature_D, False)
+			if self.checkbox_thermocycler_A:
+				meersetter.change_temperature(1, extension_temperature_A, False)
+			if self.checkbox_thermocycler_B:
+				meersetter.change_temperature(2, extension_temperature_B, False)
+			if self.checkbox_thermocycler_C:
+				meersetter.change_temperature(3, extension_temperature_C, False)
+			if self.checkbox_thermocycler_D:
+				meersetter.change_temperature(4, extension_temperature_D, False)
 			for sec in range(int(denature_time_A * 60)):
 				time.sleep(1)
-			meersetter.change_temperature(1, anneal_temperature_A, False)
-			meersetter.change_temperature(2, anneal_temperature_B, False)
-			#meersetter.change_temperature(3, anneal_temperature_C, False)
-			meersetter.change_temperature(4, anneal_temperature_D, False)
+			if self.checkbox_thermocycler_A:
+				meersetter.change_temperature(1, anneal_temperature_A, False)
+			if self.checkbox_thermocycler_B:
+				meersetter.change_temperature(2, anneal_temperature_B, False)
+			if self.checkbox_thermocycler_C:
+				meersetter.change_temperature(3, anneal_temperature_C, False)
+			if self.checkbox_thermocycler_D:
+				meersetter.change_temperature(4, anneal_temperature_D, False)
 			for sec in range(int(denature_time_A * 60)):
 				time.sleep(1)
 		# End temperatue
-		meersetter.change_temperature(1, 30, False)
-		meersetter.change_temperature(2, 30, False)
-		#meersetter.change_temperature(3, 30, False)
-		meersetter.change_temperature(4, 30, False)
+		if self.checkbox_thermocycler_A:
+			meersetter.change_temperature(1, 30, False)
+		if self.checkbox_thermocycler_B:
+			meersetter.change_temperature(2, 30, False)
+		if self.checkbox_thermocycler_C:
+			meersetter.change_temperature(3, 30, False)
+		if self.checkbox_thermocycler_D:
+			meersetter.change_temperature(4, 30, False)
 
 
 	def browse_files(self, default_file_name='thermocycler_protocol.txt'):
@@ -1109,12 +1158,12 @@ Times:
 		canvas.flush_events()
 		canvas.get_tk_widget().place(x=10, y=120)
 		canvas.draw()
-		self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, text_color='white', text='Denature', font=("Roboto Light",-16))
-		self.label_thermocycler_denature.place(x=10, y=120, width=100)
-		self.label_thermocycler_anneal = ctk.CTkLabel(master=self.frame_right, text_color='white', text='Anneal', font=("Roboto Light", -16))
-		self.label_thermocycler_anneal.place(x=110, y=120, width=100)
-		self.label_thermocycler_extension = ctk.CTkLabel(master=self.frame_right, text_color='white', text='Extension', font=("Roboto Light", -16))
-		self.label_thermocycler_extension.place(x=210, y=120, width=100)
+		self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, text_color='white', text='1st Denature', font=("Roboto Light",-12))
+		self.label_thermocycler_denature.place(x=35, y=120, width=100)
+		self.label_thermocycler_anneal = ctk.CTkLabel(master=self.frame_right, text_color='white', text='Anneal', font=("Roboto Light", -12))
+		self.label_thermocycler_anneal.place(x=135, y=120, width=60)
+		self.label_thermocycler_extension = ctk.CTkLabel(master=self.frame_right, text_color='white', text='2nd Denature', font=("Roboto Light", -12))
+		self.label_thermocycler_extension.place(x=195, y=120, width=100)
 		#self.plot_thermocycler(self.thermocycler['temperatures']['A'])
 		#self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, bg_color="white", text_color='black', text='Denature', font=("Roboto Light",-16))
 		#self.label_thermocycler_denature.place(x=10, y=120, width=100)
