@@ -1,17 +1,16 @@
 #!/usr/bin/env python3.8
 
-from cmath import nan
-import pythonnet
-from pythonnet import load
+#import pythonnet
+#from pythonnet import load
 
-load("coreclr")
+#load("coreclr")
 
-from utils import delay
-from script import Script
-from upper_gantry import UpperGantry
-from meerstetter import Meerstetter
-from fast_api_interface import FastAPIInterface
-from uvicorn_server import UvicornServer
+#from utils import delay
+#from script import Script
+#from upper_gantry import UpperGantry
+#from meerstetter import Meerstetter
+#from fast_api_interface import FastAPIInterface
+#from uvicorn_server import UvicornServer
 
 # Needed to do for pandas:
 # python3.8 -m pip install openpyxl
@@ -35,9 +34,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 # Import Office365 for using SharePoint
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
-from office365.sharepoint.files.file import File
+#from office365.runtime.auth.authentication_context import AuthenticationContext
+#from office365.sharepoint.client_context import ClientContext
+#from office365.sharepoint.files.file import File
 
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('green')
@@ -99,11 +98,14 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
-		self.server = UvicornServer()
-		self.server.start()
-		self.script = Script()
-		self.upper_gantry = UpperGantry()
-		self.fast_api_interface = FastAPIInterface()
+		self.server = None #UvicornServer()
+		#self.server.start()
+		self.script = None #Script()
+		self.upper_gantry = None #UpperGantry()
+		self.fast_api_interface = None #FastAPIInterface()
+
+		# Copy/Paste
+		self.clipboard = []
 
 		self.use_z = tkinter.IntVar()
 		self.use_z.set(1)
@@ -245,14 +247,16 @@ class App(ctk.CTk):
 			self.label_thermocycler.place(x=310, y=5) 
 			self.label_thermocycler.bind('<Button-1>', self.on_click)
 			self.button_start_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Start', command=self.start_thermocyclers)
-			self.button_start_thermocyclers.place(x=5, y=435, width=100)
-			self.button_import = ctk.CTkButton(master=self.frame_right, text='Import', command=self.import_thermocyclers)
-			self.button_import.place(x=115, y=435, width=95)
-			self.button_export = ctk.CTkButton(master=self.frame_right, text='Export', command=self.export_thermocyclers)
-			self.button_export.place(x=215, y=435, width=95) 
+			self.button_start_thermocyclers.place(x=5, y=465, width=100)
+			self.button_import = ctk.CTkButton(master=self.frame_right, text='Load', command=self.import_thermocyclers)
+			self.button_import.place(x=115, y=465, width=95)
+			self.button_export = ctk.CTkButton(master=self.frame_right, text='Save', command=self.export_thermocyclers)
+			self.button_export.place(x=215, y=465, width=95) 
 			# Progress Bar
-			self.progressbar_thermocyclers = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', mode='determinate', length = 270)
-			self.progressbar_thermocyclers.place(x=20,y=475)
+			#self.progressbar_thermocyclers = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', mode='determinate', length = 270)
+			self.progressbar_thermocyclers = ctk.CTkProgressBar(master=self.frame_right, orientation='horizontal', mode='determinate', width=270, progress_color='green', height=15)
+			self.progressbar_thermocyclers.set(0)
+			self.progressbar_thermocyclers.place(x=20,y=435)
 			#fig = Figure(figsize=(3,2.4))
 			#a = fig.add_subplot(111)
 			#data = np.array([92,92,55,55,84,84])
@@ -478,30 +482,40 @@ class App(ctk.CTk):
 			self.label_build_protocol_time_add.place(x=297, y=250)
 			self.button_build_protocol_other_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_other_add, fg_color='#4C7BD3') 
 			self.button_build_protocol_other_add.place(x=290, y=280, width=40)
+			# Estimated time
+			self.label_estimated_time = ctk.CTkLabel(master=self.frame_right, text="Estimated Time: 0 minutes", font=("Roboto Light", -14))
+			self.label_estimated_time.place(x=360,y=215)
+			# Action Progress
+			self.label_action_progress = ctk.CTkLabel(master=self.frame_right, text="Action Progress: 0 of 0", font=("Roboto Light", -14))
+			self.label_action_progress.place(x=360,y=235)
 			# Progress Bar
-			self.progressbar_build_protocol = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', length=195, mode = 'determinate')
-			self.progressbar_build_protocol.place(x=350,y=285)
+			#self.progressbar_build_protocol = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', length=195, mode = 'determinate')
+			self.progressbar_build_protocol = ctk.CTkProgressBar(master=self.frame_right, orientation='horizontal', mode='determinate', width=195, progress_color='green', height=15)
+			self.progressbar_build_protocol.set(0)
+			self.progressbar_build_protocol.place(x=350,y=265)
 			# Start
 			self.button_build_protocol_start = ctk.CTkButton(master=self.frame_right, text='Start', command=self.build_protocol_start, fg_color='#4C7BD3')
-			self.button_build_protocol_start.place(x=380, y=340, width=165)
+			self.button_build_protocol_start.place(x=460, y=330, width=85)
 			# Import
-			self.button_build_protocol_import = ctk.CTkButton(master=self.frame_right, text='Import', command=self.build_protocol_import)
-			self.button_build_protocol_import.place(x=380, y=370, width=165)
+			self.button_build_protocol_import = ctk.CTkButton(master=self.frame_right, text='Load', command=self.build_protocol_import)
+			self.button_build_protocol_import.place(x=460, y=360, width=85)
 			# Export
-			self.button_build_protocol_export = ctk.CTkButton(master=self.frame_right, text='Export', command=self.build_protocol_export)
-			self.button_build_protocol_export.place(x=380, y=400, width=165)
+			self.button_build_protocol_export = ctk.CTkButton(master=self.frame_right, text='Save', command=self.build_protocol_export)
+			self.button_build_protocol_export.place(x=460, y=390, width=85)
 			# Delete 
 			self.button_build_protocol_delete = ctk.CTkButton(master=self.frame_right, text='Delete', command=self.build_protocol_delete, fg_color='#b81414')
-			self.button_build_protocol_delete.place(x=380, y=430, width=165)
+			self.button_build_protocol_delete.place(x=460, y=420, width=85)
 			# Treeview
 			self.scrollbar_treeview_build_protocol = tkinter.Scrollbar(self.frame_right, orient='horizontal')
 			self.treeview_build_protocol = tkinter.ttk.Treeview(self.frame_right, columns=('Action'), show='headings', xscrollcommand=self.scrollbar_treeview_build_protocol.set)
 			self.scrollbar_treeview_build_protocol.config(command=self.treeview_build_protocol.xview)
-			self.treeview_build_protocol.column('Action', width=360, stretch=False)
+			self.treeview_build_protocol.column('Action', width=440, stretch=False)
 			self.treeview_build_protocol.heading('Action', text='Action')
-			self.treeview_build_protocol.place(x=5,y=320, width=360, height=160)
-			self.scrollbar_treeview_build_protocol.place(x=5, y=480, width=360)
+			self.treeview_build_protocol.place(x=5,y=320, width=440, height=160)
+			self.scrollbar_treeview_build_protocol.place(x=5, y=480, width=440)
 			self.treeview_build_protocol.bind('<Double-Button-1>', self.on_click)
+			self.treeview_build_protocol.bind('<Control-c>', self.copy)
+			self.treeview_build_protocol.bind('<Control-v>', self.paste)
 			self.__fill_build_protocol_treeview()
 		elif button_text == 'Optimize':
 			image = Image.open('deck_plate.png').resize((560, 430))
@@ -806,7 +820,8 @@ class App(ctk.CTk):
 				delta = int(action_msg.split()[-2])
 				self.upper_gantry.move_relative('forwards', delta, velocity='fast')
 			# Update the progress bar for the protocol
-			self.progressbar_build_protocol['value'] = int((i+1) / (n_tasks)) * 100
+			#self.progressbar_build_protocol['value'] = int((i+1) / (n_tasks)) * 100
+			self.progressbar_build_protocol.set(int((i+1) / (n_tasks)))
 			i = i + 1
 		self.button_build_protocol_start.configure(state=tkinter.NORMAL)
 		print('start protocol')
@@ -889,6 +904,7 @@ class App(ctk.CTk):
 		self.build_protocol_action_list = []
 		for row in self.treeview_build_protocol.get_children():
 			self.build_protocol_action_list.append(self.treeview_build_protocol.item(row)['values'][0])
+		self.label_action_progress.configure(text=f"Action Progress: 0 of {len(self.build_protocol_action_list)}")
 
 	def __fill_build_protocol_treeview(self):
 		for i in range(len(self.build_protocol_action_list)):
@@ -1037,7 +1053,7 @@ Times:
 ------------------------------------------------------""")
 		# Start timers for the thermocyclers
 		# Start a thread
-		self.progressbar_thermocyclers['value'] = 0
+		self.progressbar_thermocyclers.set(0)
 		thread = threading.Thread(target=self.thermocycle)
 		thread.start()
 
@@ -1076,7 +1092,7 @@ Times:
 		# Denature
 		time_start = time.time()
 		meersetter = Meerstetter()
-		self.progressbar_thermocyclers['value'] = 10
+		self.progressbar_thermocyclers.set(0.1)
 		if self.checkbox_thermocycler_A.get():
 			meersetter.change_temperature(1, denature_temperature_A, False)
 		if self.checkbox_thermocycler_B.get():
@@ -1091,7 +1107,8 @@ Times:
 		cycles = [i for i in range(self.thermocyclers['cycles']['A'])]
 		for cycle in cycles:
 			print(f"Cycle Number: {cycle+1}/{len(cycles)}")
-			self.progressbar_thermocyclers['value'] = 100 * (cycle+1) / len(cycles) - 10
+			#self.progressbar_thermocyclers['value'] = 100 * (cycle+1) / len(cycles) - 10
+			self.progressbar_thermocyclers.set((cycle+1) / len(cycles))
 			if self.checkbox_thermocycler_A.get():
 				meersetter.change_temperature(1, extension_temperature_A, False)
 			if self.checkbox_thermocycler_B.get():
@@ -1122,7 +1139,7 @@ Times:
 		if self.checkbox_thermocycler_D.get():
 			meersetter.change_temperature(4, 30, False)
 		# Thermocycling is done.
-		self.progressbar_thermocyclers['value'] = 100
+		self.progressbar_thermocyclers.set(1)
 
 
 
@@ -1668,6 +1685,23 @@ Times:
 	def down(self, event):
 		dz = int(self.dz.get())
 		self.upper_gantry.move_relative('down', dz)
+
+	def copy(self, event):
+		self.clipboard = []
+		for row in self.treeview_build_protocol.selection():
+			self.clipboard.append(self.treeview_build_protocol.item(row)['values'][0])
+
+	def paste(self, event):
+		try:
+			selected_row = self.treeview_build_protocol.selection()[0]
+			for action_msg in self.clipboard:
+				self.treeview_build_protocol.insert('', int(selected_row.replace('row', ''))+1, iid='row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+				self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+		except:
+			for action_msg in self.clipboard:
+				self.treeview_build_protocol.insert('', 'end', iid='row{0}'.format(self.build_protocol_treeview_row_index), values=(action_msg,))
+				self.build_protocol_treeview_row_index = self.build_protocol_treeview_row_index + 1
+		self.__update_build_protocol_action_list()
 
 	def load_status_xlsx(self):
 		import math
