@@ -1,16 +1,16 @@
 #!/usr/bin/env python3.8
 
-#import pythonnet
-#from pythonnet import load
+import pythonnet
+from pythonnet import load
 
-#load("coreclr")
+load("coreclr")
 
-#from utils import delay
-#from script import Script
-#from upper_gantry import UpperGantry
-#from meerstetter import Meerstetter
-#from fast_api_interface import FastAPIInterface
-#from uvicorn_server import UvicornServer
+from utils import delay
+from script import Script
+from upper_gantry import UpperGantry
+from meerstetter import Meerstetter
+from fast_api_interface import FastAPIInterface
+from uvicorn_server import UvicornServer
 
 # Needed to do for pandas:
 # python3.8 -m pip install openpyxl
@@ -34,9 +34,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 # Import Office365 for using SharePoint
-#from office365.runtime.auth.authentication_context import AuthenticationContext
-#from office365.sharepoint.client_context import ClientContext
-#from office365.sharepoint.files.file import File
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
+from office365.sharepoint.files.file import File
 
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('green')
@@ -98,11 +98,11 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
-		self.server = None #UvicornServer()
-		#self.server.start()
-		self.script = None #Script()
-		self.upper_gantry = None #UpperGantry()
-		self.fast_api_interface = None #FastAPIInterface()
+		self.server = UvicornServer()
+		self.server.start()
+		self.script = Script()
+		self.upper_gantry = UpperGantry()
+		self.fast_api_interface = FastAPIInterface()
 
 		# Copy/Paste
 		self.clipboard = []
@@ -246,12 +246,14 @@ class App(ctk.CTk):
 			self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='thermocycler', font=("Roboto Light", -1), image=self.img_thermocycler)
 			self.label_thermocycler.place(x=310, y=5) 
 			self.label_thermocycler.bind('<Button-1>', self.on_click)
-			self.button_start_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Start', command=self.start_thermocyclers)
+			self.button_start_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Start', command=self.start_thermocyclers, fg_color='#4C7BD3')
 			self.button_start_thermocyclers.place(x=5, y=465, width=100)
 			self.button_import = ctk.CTkButton(master=self.frame_right, text='Load', command=self.import_thermocyclers)
-			self.button_import.place(x=115, y=465, width=95)
+			self.button_import.place(x=110, y=465, width=55)
 			self.button_export = ctk.CTkButton(master=self.frame_right, text='Save', command=self.export_thermocyclers)
-			self.button_export.place(x=215, y=465, width=95) 
+			self.button_export.place(x=170, y=465, width=55) 
+			self.button_home_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Home', command=self.home_thermocyclers)
+			self.button_home_thermocyclers.place(x=230, y=465, width=55)
 			# Progress Bar
 			#self.progressbar_thermocyclers = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', mode='determinate', length = 270)
 			self.progressbar_thermocyclers = ctk.CTkProgressBar(master=self.frame_right, orientation='horizontal', mode='determinate', width=270, progress_color='green', height=15)
@@ -475,7 +477,7 @@ class App(ctk.CTk):
 			self.label_build_protocol_other_options.place(x=150, y=250)
 			self.build_protocol_other_sv = StringVar()
 			self.build_protocol_other_sv.set("Home Pipettor")
-			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=("Home Pipettor", "Move Relative Left", "Move Relative Right", "Move Relative Backwards", "Move Relative Forwards", "Move Relative Down", "Move Relative Up", 'Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet'))
+			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=("Home Pipettor", "Move Relative Left", "Move Relative Right", "Move Relative Backwards", "Move Relative Forwards", "Move Relative Down", "Move Relative Up", 'Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet', "Pre-Amp Thermocycle (Not Functional)", "Generate Standard Droplets on DG8 1000 (Not Functional)", "Generate Standard Droplets on DG8 0100 (Not Functional)", "Generate Standard Droplets on DG8 0010 (Not Functional)", "Generate Standard Droplets on DG8 0001 (Not Functional)", "Generate Pico Droplets on DG8 1000 (Not Functional)", "Generate Pico Droplets on DG8 0100 (Not Functional)", "Generate Pico Droplets on DG8 0010 (Not Functional)", "Generate Pico Droplets on DG8 0001 (Not Functional)", "Move Lid (Not Functional)", "Move Chip (Not Functional)"))
 			self.optionmenu_build_protocol_other.place(x=85, y=280, width=200)
 			# Other: Add
 			self.label_build_protocol_time_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
@@ -696,12 +698,19 @@ class App(ctk.CTk):
 		thread.start()
 
 	def start_protocol(self):
+		self.progressbar_build_protocol.set(0)
 		self.__update_build_protocol_action_list()
 		n_tasks = len(self.build_protocol_action_list)
 		i = 0
 		for row in self.treeview_build_protocol.get_children():
 			self.treeview_build_protocol.selection_set(row)
 			action_msg = self.treeview_build_protocol.item(row)['values'][0]
+			action_progress_index = int(self.label_action_progress.cget('text').split()[-3]) + 1
+			action_progress_text = self.label_action_progress.cget('text').split()
+			action_progress_text[-3] = str(action_progress_index)
+			action_progress_text = ' '.join(action_progress_text)
+			self.label_action_progress.configure(text=action_progress_text)
+			
 			# Parse the action message to determine which command to run.
 			if "Eject" in action_msg:
 				if "Tray" not in action_msg:
@@ -791,10 +800,30 @@ class App(ctk.CTk):
 				self.script.elution(self.upper_gantry, full_protocol=False)
 			elif "Extraction" in action_msg:
 				self.script.extraction(self.upper_gantry, full_protocol=False)
-			elif "Generate Standard Droplets" in action_msg:
-				self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
-			elif "Generate Pico Droplets" in action_msg:
-				self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
+			elif "Generate Standard Droplets on DG8 1000 (Not Functional)" in action_msg:
+				#self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
+				print('Not Functional')
+			elif "Generate Standard Droplets on DG8 0100 (Not Functional)" in action_msg:
+				#self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
+				print('Not Functional')
+			elif "Generate Standard Droplets on DG8 0010 (Not Functional)" in action_msg:
+				#self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
+				print('Not Functional')
+			elif "Generate Standard Droplets on DG8 0001 (Not Functional)" in action_msg:
+				#self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
+				print('Not Functional')
+			elif "Generate Pico Droplets on DG8 1000 (Not Functional)" in action_msg:
+				#self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
+				print('Not functional')
+			elif "Generate Pico Droplets on DG8 0100 (Not Functional)" in action_msg:
+				#self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
+				print('Not functional')
+			elif "Generate Pico Droplets on DG8 0010 (Not Functional)" in action_msg:
+				#self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
+				print('Not functional')
+			elif "Generate Pico Droplets on DG8 0001 (Not Functional)" in action_msg:
+				#self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
+				print('Not functional')
 			elif "Assay Prep" in action_msg:
 				self.script.assay_prep(self.upper_gantry)
 			elif "Engage Magnet" in action_msg:
@@ -819,12 +848,14 @@ class App(ctk.CTk):
 			elif "Move Relative Forwards" in action_msg:
 				delta = int(action_msg.split()[-2])
 				self.upper_gantry.move_relative('forwards', delta, velocity='fast')
+			elif "Pre-Amp Thermocycle" in action_msg:
+				print('thermocycle')
 			# Update the progress bar for the protocol
 			#self.progressbar_build_protocol['value'] = int((i+1) / (n_tasks)) * 100
-			self.progressbar_build_protocol.set(int((i+1) / (n_tasks)))
+			self.progressbar_build_protocol.set((i+1) / (n_tasks))
 			i = i + 1
 		self.button_build_protocol_start.configure(state=tkinter.NORMAL)
-		print('start protocol')
+		#self.progressbar_build_protocol.set(0)
 
 	def build_protocol_import(self):
 		# Write the Build Protocol from a txt file to the Build Protocol Treeview
@@ -846,14 +877,16 @@ class App(ctk.CTk):
 
 	def build_protocol_delete(self):
 		try:
-			selected_row = self.treeview_build_protocol.selection()[0]
-			self.treeview_build_protocol.delete(selected_row)
+			#selected_row = self.treeview_build_protocol.selection()[0]
+			for selected_row in self.treeview_build_protocol.selection():
+				self.treeview_build_protocol.delete(selected_row)
 			self.__update_build_protocol_action_list()
 		except:
 			pass
 
 	def home_pipettor(self):
-		self.upper_gantry.home_pipettor()
+		thread = threading.Thread(target=self.upper_gantry.home_pipettor)
+		thread.start()
 	def home_pipettor_z(self):
 		self.fast_api_interface.pipettor_gantry.axis.home('pipettor_gantry', 3, False, True)
 	def home_pipettor_y(self):
@@ -964,17 +997,17 @@ class App(ctk.CTk):
 	def build_protocol_other_add(self):
 		action_msg = self.build_protocol_other_sv.get()
 		if 'Up' in action_msg:
-			action_msg = action_msg + f" by {self.dz} usteps"
+			action_msg = action_msg + f" by {self.dz.get()} usteps"
 		elif 'Down' in action_msg:
-			action_msg = action_msg + f" by {self.dz} usteps"
+			action_msg = action_msg + f" by {self.dz.get()} usteps"
 		elif 'Left' in action_msg:
-			action_msg = action_msg + f" by {self.dx} usteps"
+			action_msg = action_msg + f" by {self.dx.get()} usteps"
 		elif 'Right' in action_msg:
-			action_msg = action_msg + f" by {self.dx} usteps"
+			action_msg = action_msg + f" by {self.dx.get()} usteps"
 		elif 'Backwards' in action_msg:
-			action_msg = action_msg + f" by {self.dy} usteps"
+			action_msg = action_msg + f" by {self.dy.get()} usteps"
 		elif 'Forwards' in action_msg:
-			action_msg = action_msg + f" by {self.dy} usteps"
+			action_msg = action_msg + f" by {self.dy.get()} usteps"
 		self.build_protocol_add(action_msg)
 
 	def update_coordinate(self):
@@ -991,6 +1024,21 @@ class App(ctk.CTk):
 
 	def callback_dz(self, event):
 		self.dz.set(self.entry_settings_dz.get())
+
+	def __home_thermocyclers(self):
+		self.fast_api_interface.reader.axis.home('reader', 8, False)
+		self.fast_api_interface.reader.axis.home('reader', 9, False)
+		self.fast_api_interface.reader.axis.home('reader', 10, False)
+		self.fast_api_interface.reader.axis.home('reader', 11, True)
+		self.fast_api_interface.reader.axis.home('reader', 6, False)
+		self.fast_api_interface.reader.axis.home('reader', 7, False)
+		image = Image.open('thermocycler.png').resize((250, 470))
+		self.img_thermocycler = ImageTk.PhotoImage(image)
+		self.label_thermocycler.configure(image=self.img_thermocycler)
+
+	def home_thermocyclers(self) -> None:
+		thread = threading.Thread(target=self.__home_thermocyclers)
+		thread.start()
 
 	def start_thermocyclers(self) -> None:
 		# Create a file for logging.\
@@ -1102,6 +1150,7 @@ Times:
 		if self.checkbox_thermocycler_D.get():
 			meersetter.change_temperature(4, denature_temperature_D, False)
 		for sec in range(int(denature_time_A * 60)):
+			print(f"Second {sec}")
 			time.sleep(1)
 		# Thermocycle
 		cycles = [i for i in range(self.thermocyclers['cycles']['A'])]
@@ -1117,7 +1166,8 @@ Times:
 				meersetter.change_temperature(3, extension_temperature_C, False)
 			if self.checkbox_thermocycler_D.get():
 				meersetter.change_temperature(4, extension_temperature_D, False)
-			for sec in range(int(denature_time_A)):
+			for sec in range(int(extension_time_A)):
+				print(f"Second {sec} for cycle {cycle+1} high")
 				time.sleep(1)
 			if self.checkbox_thermocycler_A.get():
 				meersetter.change_temperature(1, anneal_temperature_A, False)
@@ -1127,7 +1177,8 @@ Times:
 				meersetter.change_temperature(3, anneal_temperature_C, False)
 			if self.checkbox_thermocycler_D.get():
 				meersetter.change_temperature(4, anneal_temperature_D, False)
-			for sec in range(int(denature_time_A)):
+			for sec in range(int(anneal_time_A)):
+				print(f"Second {sec} for cycle {cycle+1} low")
 				time.sleep(1)
 		# End temperatue
 		if self.checkbox_thermocycler_A.get():
@@ -1664,32 +1715,45 @@ Times:
 
 	def backwards(self, event):
 		dy = int(self.dy.get())
-		self.upper_gantry.move_relative('backwards', dy)
+		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('backwards', dy,))
+		thread.start()
+		#self.upper_gantry.move_relative('backwards', dy)
 
 	def left(self, event):
 		dx = int(self.dx.get())
-		self.upper_gantry.move_relative('left', dx)
+		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('left', dx,))
+		thread.start()
+		#self.upper_gantry.move_relative('left', dx)
 
 	def forwards(self, event):
 		dy = int(self.dy.get())
-		self.upper_gantry.move_relative('forwards', dy)
+		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('forwards', dy,))
+		thread.start()
+		#self.upper_gantry.move_relative('forwards', dy)
 
 	def right(self, event):
 		dx = int(self.dx.get())
-		self.upper_gantry.move_relative('right', dx)
+		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('right', dx,))
+		thread.start()
+		#self.upper_gantry.move_relative('right', dx)
 
 	def up(self, event):
 		dz = int(self.dz.get())
-		self.upper_gantry.move_relative('up', dz)
+		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('up', dz,))
+		thread.start()
+		#self.upper_gantry.move_relative('up', dz)
 
 	def down(self, event):
 		dz = int(self.dz.get())
-		self.upper_gantry.move_relative('down', dz)
+		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('down', dz,))
+		thread.start()
+		#self.upper_gantry.move_relative('down', dz)
 
 	def copy(self, event):
 		self.clipboard = []
 		for row in self.treeview_build_protocol.selection():
 			self.clipboard.append(self.treeview_build_protocol.item(row)['values'][0])
+		self.clipboard.reverse()
 
 	def paste(self, event):
 		try:
