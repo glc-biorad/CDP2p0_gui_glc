@@ -1,16 +1,16 @@
 #!/usr/bin/env python3.8
 
-import pythonnet
-from pythonnet import load
+#import pythonnet
+#from pythonnet import load
 
-load("coreclr")
+#load("coreclr")
 
-from utils import delay
-from script import Script
-from upper_gantry import UpperGantry
-from meerstetter import Meerstetter
-from fast_api_interface import FastAPIInterface
-from uvicorn_server import UvicornServer
+#from utils import delay
+#from script import Script
+#from upper_gantry import UpperGantry
+#from meerstetter import Meerstetter
+#from fast_api_interface import FastAPIInterface
+#from uvicorn_server import UvicornServer
 
 # Needed to do for pandas:
 # python3.8 -m pip install openpyxl
@@ -34,9 +34,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 # Import Office365 for using SharePoint
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
-from office365.sharepoint.files.file import File
+#from office365.runtime.auth.authentication_context import AuthenticationContext
+#from office365.sharepoint.client_context import ClientContext
+#from office365.sharepoint.files.file import File
 
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('green')
@@ -98,11 +98,11 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
-		self.server = UvicornServer()
-		self.server.start()
-		self.script = Script()
-		self.upper_gantry = UpperGantry()
-		self.fast_api_interface = FastAPIInterface()
+		self.server = None #UvicornServer()
+		#self.server.start()
+		self.script = None #Script()
+		self.upper_gantry = None #UpperGantry()
+		self.fast_api_interface = None #FastAPIInterface()
 
 		# Copy/Paste
 		self.clipboard = []
@@ -119,6 +119,12 @@ class App(ctk.CTk):
 		self.dy.set('5000')
 		self.dz = StringVar()
 		self.dz.set('5000')
+		self.image_dx_sv = StringVar()
+		self.image_dx_sv.set('500')
+		self.image_dy_sv = StringVar()
+		self.image_dy_sv.set('500')
+		self.image_dz_sv = StringVar()
+		self.image_dz_sv.set('500')
 		self.build_protocol_tips_tray_sv = StringVar('')
 		self.bind('<Motion>', self.motion)
 		self.clamp_A_max = StringVar()
@@ -141,6 +147,15 @@ class App(ctk.CTk):
 		self.use_thermocycler_C.set(0)
 		self.use_thermocycler_D = tkinter.IntVar()
 		self.use_thermocycler_D.set(1)
+		self.service_topic_sv = StringVar()
+		self.service_topic_sv.set('')
+		self.image_filter_sv = StringVar()
+		self.image_filter_sv.set('')
+		self.image_led_sv = StringVar()
+		self.image_led_sv.set('Off')
+		self.brightfield_on = False
+		self.thermocycler_cycles_sv = StringVar()
+		self.thermocycler_cycles_sv.set(str(self.thermocyclers['cycles']['A']))
 
 		# Volume in tips
 		self.pipettor_current_volume = 0
@@ -206,6 +221,7 @@ class App(ctk.CTk):
 			self.button_optimize.configure(border_color='#ffffff', border_width=2)
 		elif button_text == 'Service':
 			self.button_service.configure(border_color='#ffffff', border_width=2)
+			self.service_topic_sv.set('')
 		elif button_text == 'Status':
 			self.button_status.configure(border_color='#ffffff', border_width=2)
 		elif button_text == 'Configure':
@@ -217,14 +233,68 @@ class App(ctk.CTk):
 			widget.destroy()
 		self.__toggle_frame_left_button_background(button_text)
 		if button_text == 'Image':
-			self.label_image_1 = ctk.CTkLabel(master=self.frame_right, text='Image', font=("Roboto Medium", -16))
-			self.label_image_1.grid(row=1, column=0, pady=10, padx=10)
-			self.button_image.configure()
+			# Image: View
+			self.textbox_image_view = ctk.CTkTextbox(master=self.frame_right, width=400, height=400, font=("Roboto Medium", -12), state='disabled')
+			self.textbox_image_view.place(x=10,y=10)
+			# Image: Relative Moves
+			self.label_image_relative_moves = ctk.CTkLabel(master=self.frame_right, text="Relative Moves", font=("Roboto Medium", -16))
+			self.label_image_relative_moves.place(x=150,y=420)
+			# Image: Relative Moves (dx)
+			self.label_image_dx = ctk.CTkLabel(master=self.frame_right, text='dx', font=("Roboto Medium", -14))
+			self.label_image_dx.place(x=30, y=455)
+			self.entry_image_dx = ctk.CTkEntry(master=self.frame_right, textvariable=self.image_dx_sv, font=("Roboto Medium", -14), width=80)
+			self.entry_image_dx.place(x=60,y=455)
+			# Image: Relative Moves (dy)
+			self.label_image_dy = ctk.CTkLabel(master=self.frame_right, text='dy', font=("Roboto Medium", -14))
+			self.label_image_dy.place(x=150, y=455)
+			self.entry_image_dy = ctk.CTkEntry(master=self.frame_right, textvariable=self.image_dy_sv, font=("Roboto Medium", -14), width=80)
+			self.entry_image_dy.place(x=180,y=455)
+			# Image: Relative Moves (dz)
+			self.label_image_dz = ctk.CTkLabel(master=self.frame_right, text='dz', font=("Roboto Medium", -14))
+			self.label_image_dz.place(x=270, y=455)
+			self.entry_image_dz = ctk.CTkEntry(master=self.frame_right, textvariable=self.image_dz_sv, font=("Roboto Medium", -14), width=80)
+			self.entry_image_dz.place(x=300,y=455)
+			# Image: Filters
+			self.label_image_filter = ctk.CTkLabel(master=self.frame_right, text='Filter', font=("Roboto Medium", -16))
+			self.label_image_filter.place(x=470,y=10)
+			self.optionmenu_image_filter = ctk.CTkOptionMenu(master=self.frame_right, variable=self.image_filter_sv, values=('HEX', 'FAM', 'ATTO590', 'ALEXA405', 'CY5', 'CY5.5', 'Home'))
+			self.optionmenu_image_filter.place(x=425,y=40, width=120)
+			# Image: LED
+			self.label_image_led = ctk.CTkLabel(master=self.frame_right, text='LED', font=("Roboto Medium", -16))
+			self.label_image_led.place(x=475, y=70)
+			self.optionmenu_image_led = ctk.CTkOptionMenu(master=self.frame_right, variable=self.image_led_sv, values=('HEX', 'FAM', 'ATTO590', 'ALEXA405', 'CY5', 'CY5.5', 'Off'))
+			self.image_led_sv.trace('w', self.callback_image_led_sv)
+			self.optionmenu_image_led.place(x=425, y=100, width=120)
+			# Image: Options
+			self.label_image_options = ctk.CTkLabel(master=self.frame_right, text='Options', font=("Roboto Medium", -16))
+			self.label_image_options.place(x=460, y=130)
+			# Image: Brightfield
+			self.button_image_brightfield = ctk.CTkButton(master=self.frame_right, text='Brightfield', font=("Roboto Medium", -16), width=120, command=self.brightfield, height=30)
+			self.button_image_brightfield.place(x=425, y=160)
+			# Image: Auto-Focus
+			self.button_image_auto_focus = ctk.CTkButton(master=self.frame_right, text='Auto-Focus', font=("Roboto Medium", -16), width=120, command=self.auto_focus, height=30)
+			self.button_image_auto_focus.place(x=425, y=200)
+			# Image: Save View
+			self.button_image_save_view = ctk.CTkButton(master=self.frame_right, text="Save View", font=("Roboto Medium", -16), width=120, command=self.save_view, height=30)
+			self.button_image_save_view.place(x=425, y=240)
+			# Image: Load View
+			self.button_image_load_view = ctk.CTkButton(master=self.frame_right, text="Load View", font=("Roboto Medium", -16), width=120, command=self.load_view, height=30)
+			self.button_image_load_view.place(x=425, y=280)
+			# Image: Scan Chip
+			self.button_image_scan_chip = ctk.CTkButton(master=self.frame_right, text="Scan Chip", font=("Roboto Medium", -16), width=120, command=self.scan_chip, height=30)
+			self.button_image_scan_chip.place(x=425, y=320)
+			# Image: Home Imager
+			self.button_image_home_imager = ctk.CTkButton(master=self.frame_right, text="Home Imager", font=("Roboto Medium", -16), width=120, command=self.home_imager, height=30)
+			self.button_image_home_imager.place(x=425, y=360)
+			# Image: LED Intensity
+			self.label_image_led_intensity = ctk.CTkLabel(master=self.frame_right, text="LED Intensity", font=("Roboto Medium", -16))
+			self.label_image_led_intensity.place(x=435,y=400)
+			self.slider_image_led_intensity = ctk.CTkSlider(master=self.frame_right, from_=0, to=100, number_of_steps=10, progress_color='green', command=self.slider_image_led_intensity_event, width=120, height=20)
+			self.slider_image_led_intensity.set(0)
+			self.slider_image_led_intensity.configure(state='disabled')
+			self.slider_image_led_intensity.place(x=420,y=440)
 		elif button_text == 'Thermocycle':
-			#self.label_thermocycle_1 = ctk.CTkLabel(master=self.frame_right, text="Denature Temperature (Celsius)", font=("Roboto Medium", -16))
-			#self.label_thermocycle_1.grid(row=1, column=0, pady=10, padx=10)
-			#self.entry_thermocycle_1 = ctk.CTkEntry(master=self.frame_right)
-			#self.entry_thermocycle_1.grid(row=1, column=1, pady=20, padx=20)
+			# Thermocycle
 			self.label_thermocycler_title = ctk.CTkLabel(master=self.frame_right, text="Thermocycle Protocol", font=("Roboto Bold", -20))
 			self.label_thermocycler_title.place(x=50, y=0)
 			self.label_thermocycler = ctk.CTkLabel(master=self.frame_right, text='Thermocycler', font=("Roboto Light", -16))
@@ -236,9 +306,9 @@ class App(ctk.CTk):
 			self.optionmenu_thermocycler.place(x=150, y=40)
 			self.label_thermocycler_cycles = ctk.CTkLabel(master=self.frame_right, text='Cycles', font=("Roboto Light", -16))
 			self.label_thermocycler_cycles.place(x=0, y=80)
-			thermocycler_cycles_sv = StringVar()
-			thermocycler_cycles_sv.set(str(self.thermocyclers['cycles'][thermocycler]))
-			self.entry_thermocycler_cycles = ctk.CTkEntry(master=self.frame_right, textvariable=thermocycler_cycles_sv)
+			#self.thermocycler_cycles_sv = StringVar()
+			#thermocycler_cycles_sv.set(str(self.thermocyclers['cycles'][thermocycler]))
+			self.entry_thermocycler_cycles = ctk.CTkEntry(master=self.frame_right, textvariable=self.thermocycler_cycles_sv)
 			self.entry_thermocycler_cycles.bind('<FocusOut>', self.callback_thermocycler_cycles)
 			self.entry_thermocycler_cycles.place(x=150, y=80)
 			image = Image.open(self.thermocycler_png_name).resize((250, 470))
@@ -247,30 +317,17 @@ class App(ctk.CTk):
 			self.label_thermocycler.place(x=310, y=5) 
 			self.label_thermocycler.bind('<Button-1>', self.on_click)
 			self.button_start_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Start', command=self.start_thermocyclers, fg_color='#4C7BD3')
-			self.button_start_thermocyclers.place(x=5, y=465, width=100)
+			self.button_start_thermocyclers.place(x=45, y=465, width=55)
 			self.button_import = ctk.CTkButton(master=self.frame_right, text='Load', command=self.import_thermocyclers)
-			self.button_import.place(x=110, y=465, width=55)
+			self.button_import.place(x=105, y=465, width=55)
 			self.button_export = ctk.CTkButton(master=self.frame_right, text='Save', command=self.export_thermocyclers)
-			self.button_export.place(x=170, y=465, width=55) 
+			self.button_export.place(x=165, y=465, width=55) 
 			self.button_home_thermocyclers = ctk.CTkButton(master=self.frame_right, text='Home', command=self.home_thermocyclers)
-			self.button_home_thermocyclers.place(x=230, y=465, width=55)
+			self.button_home_thermocyclers.place(x=225, y=465, width=55)
 			# Progress Bar
-			#self.progressbar_thermocyclers = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', mode='determinate', length = 270)
-			self.progressbar_thermocyclers = ctk.CTkProgressBar(master=self.frame_right, orientation='horizontal', mode='determinate', width=270, progress_color='green', height=15)
+			self.progressbar_thermocyclers = ctk.CTkProgressBar(master=self.frame_right, orientation='horizontal', mode='determinate', progress_color='green', height=25, corner_radius=0, width=260)
 			self.progressbar_thermocyclers.set(0)
-			self.progressbar_thermocyclers.place(x=20,y=435)
-			#fig = Figure(figsize=(3,2.4))
-			#a = fig.add_subplot(111)
-			#data = np.array([92,92,55,55,84,84])
-			#x = np.array([1,2,3,4,5,6])
-			#a.set_yticks([92,55,84])
-			#a.set_xticks([])
-			#a.axvline(x=2.5)
-			#a.axvline(x=4.5)
-			#a.plot(x, data, color='red')
-			#canvas = FigureCanvasTkAgg(fig, master=self.frame_right)
-			#canvas.get_tk_widget().place(x=10, y=120)
-			#canvas.draw()
+			self.progressbar_thermocyclers.place(x=30,y=432)
 			self.plot_thermocycler(self.thermocyclers['temperatures']['A'])
 			self.label_thermocycler_denature = ctk.CTkLabel(master=self.frame_right, text_color='white', text='1st Denature', font=("Roboto Light",-12))
 			self.label_thermocycler_denature.place(x=35, y=120, width=100)
@@ -347,108 +404,101 @@ class App(ctk.CTk):
 			self.checkbox_thermocycler_D = ctk.CTkCheckBox(master=self.frame_right, variable=self.use_thermocycler_D, onvalue=1, offvalue=0, text='')
 			self.checkbox_thermocycler_D.place(x=520, y=475)
 		elif button_text == "Build Protocol":
-			#self.radiobutton_script_builder_iv = tkinter.IntVar(0)
-			#self.radiobutton_script_builder = ctk.CTkRadioButton(master=self.frame_right, text="Script Builder", variable=self.radiobutton_script_builder_iv, command=self.script_builder_radiobutton_event)
-			#self.radiobutton_script_builder.place(x=5, y=10)
-			#self.radiobutton_drag_tool_iv = tkinter.IntVar()
-			#self.radiobutton_drag_tool_iv.set(1)
-			#self.radiobutton_drag_tool = ctk.CTkRadioButton(master=self.frame_right, text="Drag Tool", variable=self.radiobutton_drag_tool_iv, command=self.drag_tool_radiobutton_event)
-			#self.radiobutton_drag_tool.place(x=130,y=10)
 			# Script builder defaults
 			# Tips: 
 			self.label_build_protocol_tips = ctk.CTkLabel(master=self.frame_right, text='Tips', font=("Roboto Medium", -16))
 			self.label_build_protocol_tips.place(x=5, y=40)
 			# Tips: Tray
 			self.label_build_protocol_tips_tray = ctk.CTkLabel(master=self.frame_right, text='Tray', font=("Roboto Light", -14))
-			self.label_build_protocol_tips_tray.place(x=140, y=10)
+			self.label_build_protocol_tips_tray.place(x=190, y=10)
 			self.build_protocol_tips_tray_sv = StringVar('')
-			self.optionmenu_build_protocol_tips_tray = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_tray_sv, values=('A', 'B', 'C', 'D', "Tip Transfer Tray", ''), font=("Roboto Light", -12)) 
-			self.optionmenu_build_protocol_tips_tray.place(x=80, y=40, width=150)
+			self.optionmenu_build_protocol_tips_tray = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_tray_sv, values=('A', 'B', 'C', 'D', "Tip Transfer Tray", ''), font=("Roboto Light", -14)) 
+			self.optionmenu_build_protocol_tips_tray.place(x=80, y=40, width=250)
 			# Tips: Column
 			self.label_build_protocol_tips_column = ctk.CTkLabel(master=self.frame_right, text='Column', font=("Roboto Light", -14))
-			self.label_build_protocol_tips_column.place(x=245, y=10)
+			self.label_build_protocol_tips_column.place(x=345, y=10)
 			self.build_protocol_tips_column_sv = StringVar('')
-			self.optionmenu_build_protocol_tips_column = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_column_sv, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''), font=("Roboto Light", -12))
-			self.optionmenu_build_protocol_tips_column.place(x=235, y=40, width=65)
+			self.optionmenu_build_protocol_tips_column = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_column_sv, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''), font=("Roboto Light", -14))
+			self.optionmenu_build_protocol_tips_column.place(x=335, y=40, width=65)
 			# Tips: Action
 			self.label_build_protocol_tips_action = ctk.CTkLabel(master=self.frame_right, text='Action', font=("Roboto Medium", -14))
-			self.label_build_protocol_tips_action.place(x=325, y=10)
+			self.label_build_protocol_tips_action.place(x=435, y=10)
 			self.build_protocol_tips_action_sv = StringVar()
 			self.build_protocol_tips_action_sv.set('Eject')
-			self.optionmenu_build_protocol_tips_action = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_action_sv, values=('Eject', 'Pickup'), font=("Roboto Light", -12))
-			self.optionmenu_build_protocol_tips_action.place(x=305, y=40, width=80)
+			self.optionmenu_build_protocol_tips_action = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_tips_action_sv, values=('Eject', 'Pickup'), font=("Roboto Light", -14))
+			self.optionmenu_build_protocol_tips_action.place(x=405, y=40, width=100)
 			# Tips: Add
 			self.label_build_protocol_tips_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
-			self.label_build_protocol_tips_add.place(x=397, y=10)
+			self.label_build_protocol_tips_add.place(x=517, y=10)
 			self.button_build_protocol_tips_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_tips_add, fg_color='#4C7BD3') 
-			self.button_build_protocol_tips_add.place(x=390, y=40, width=40)
+			self.button_build_protocol_tips_add.place(x=510, y=40, width=40)
 			# Motion:
 			self.label_build_protocol_motion = ctk.CTkLabel(master=self.frame_right, text='Motion', font=("Roboto Medium", -16))
 			self.label_build_protocol_motion.place(x=5, y=100)
 			# Motion: Consumable
 			self.label_build_protocol_motion_consumable = ctk.CTkLabel(master=self.frame_right, text='Consumable', font=("Roboto Light", -14))
-			self.label_build_protocol_motion_consumable.place(x=110, y=70) #30,150
+			self.label_build_protocol_motion_consumable.place(x=163, y=70) #30,150
 			self.build_protocol_motion_consumable_sv = StringVar('')
-			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp", "Quant Strip", "Aux Heater"), font=("Roboto Light", -10)) 
-			self.optionmenu_build_protocol_motion_consumable.place(x=80, y=100, width=130)
+			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp", "Quant Strip", "Aux Heater"), font=("Roboto Light", -14)) 
+			self.optionmenu_build_protocol_motion_consumable.place(x=80, y=100, width=235)
 			# Motion: Tray
 			self.label_build_protocol_motion_tray = ctk.CTkLabel(master=self.frame_right, text='Tray', font=("Roboto Light", -14))
-			self.label_build_protocol_motion_tray.place(x=225, y=70)
+			self.label_build_protocol_motion_tray.place(x=330, y=70)
 			self.build_protocol_motion_tray_sv = StringVar('')
 			self.optionmenu_build_protocol_motion_tray = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tray_sv, values=('A', 'B', 'C', 'D', ''))
-			self.optionmenu_build_protocol_motion_tray.place(x=215,y=100,width=50)
+			self.optionmenu_build_protocol_motion_tray.place(x=320,y=100,width=50)
 			# Motion: Column
 			self.label_build_protocol_motion_column = ctk.CTkLabel(master=self.frame_right, text='Column', font=("Roboto Light", -14))
-			self.label_build_protocol_motion_column.place(x=270, y=70)
+			self.label_build_protocol_motion_column.place(x=375, y=70)
 			self.build_protocol_motion_column_sv = StringVar('')
-			self.optionmenu_build_protocol_motion_column = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_column_sv, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''), font=("Roboto Light", -12))
-			self.optionmenu_build_protocol_motion_column.place(x=270, y=100, width=55)
+			self.optionmenu_build_protocol_motion_column = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_column_sv, values=('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', ''), font=("Roboto Light", -14))
+			self.optionmenu_build_protocol_motion_column.place(x=375, y=100, width=55)
 			# Motion: Tip
 			self.label_build_protocol_motion_tip = ctk.CTkLabel(master=self.frame_right, text='Tip (uL)', font=("Roboto Light", -14))
-			self.label_build_protocol_motion_tip.place(x=330, y=70)
+			self.label_build_protocol_motion_tip.place(x=445, y=70)
 			self.build_protocol_motion_tip_sv = StringVar()
 			self.build_protocol_motion_tip_sv.set('1000')
-			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tip_sv, values=('1000', '50', '200', ''), font=("Roboto Light", -7)) 
-			self.optionmenu_build_protocol_motion_tip.place(x=330,y=100,width=55)
+			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tip_sv, values=('1000', '50', '200', ''), font=("Roboto Light", -14)) 
+			self.optionmenu_build_protocol_motion_tip.place(x=435,y=100,width=70)
 			# Motion: Add
 			self.label_build_protocol_motion_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
-			self.label_build_protocol_motion_add.place(x=397, y=70)
+			self.label_build_protocol_motion_add.place(x=517, y=70)
 			self.button_build_protocol_motion_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_motion_add, fg_color='#4C7BD3') 
-			self.button_build_protocol_motion_add.place(x=390, y=100, width=40)
+			self.button_build_protocol_motion_add.place(x=510, y=100, width=40)
 			# Pipettor:
 			self.label_build_protocol_pipettor = ctk.CTkLabel(master=self.frame_right, text='Pipettor', font=("Roboto Medium", -16))
 			self.label_build_protocol_pipettor.place(x=5, y=160)
 			# Pipettor: Volume
-			self.label_build_protocol_pipettor_volume = ctk.CTkLabel(master=self.frame_right, text='Vol. (uL)', font=("Roboto Medium", -14))
-			self.label_build_protocol_pipettor_volume.place(x=82, y=130)
+			self.label_build_protocol_pipettor_volume = ctk.CTkLabel(master=self.frame_right, text='Volume (uL)', font=("Roboto Medium", -14))
+			self.label_build_protocol_pipettor_volume.place(x=92, y=130)
 			self.entry_build_protocol_pipettor_volume = ctk.CTkEntry(master=self.frame_right)
-			self.entry_build_protocol_pipettor_volume.place(x=85, y=160, width=45)
+			self.entry_build_protocol_pipettor_volume.place(x=85, y=160, width=95)
 			# Pipettor: Tip
 			self.label_build_protocol_pipettor_tip = ctk.CTkLabel(master=self.frame_right, text='Tip (uL)', font=("Roboto Medium", -14))
-			self.label_build_protocol_pipettor_tip.place(x=150, y=130)
+			self.label_build_protocol_pipettor_tip.place(x=200, y=130)
 			self.build_protocol_pipettor_tip = StringVar()
 			self.build_protocol_pipettor_tip.set('1000')
 			self.optionmenu_build_protocol_pipettor_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_tip, values=('1000', '50', '200'))
-			self.optionmenu_build_protocol_pipettor_tip.place(x=135, y=160, width=70)
+			self.optionmenu_build_protocol_pipettor_tip.place(x=185, y=160, width=70)
 			# Pipettor: Action
 			self.label_build_protocol_pipettor_action = ctk.CTkLabel(master=self.frame_right, text='Action', font=("Roboto Medium", -14))
-			self.label_build_protocol_pipettor_action.place(x=230,y=130)
+			self.label_build_protocol_pipettor_action.place(x=295,y=130)
 			self.build_protocol_pipettor_action_sv = StringVar()
 			self.build_protocol_pipettor_action_sv.set('Aspirate')
-			self.optionmenu_build_protocol_pipettor_action = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_action_sv, values=('Aspirate', 'Dispense'))
-			self.optionmenu_build_protocol_pipettor_action.place(x=210, y=160, width=90)
+			self.optionmenu_build_protocol_pipettor_action = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_action_sv, values=('Aspirate', 'Dispense', 'Mix'))
+			self.optionmenu_build_protocol_pipettor_action.place(x=260, y=160, width=120)
 			# Pipettor: Pressure
 			self.label_build_protocol_pipettor_pressure = ctk.CTkLabel(master=self.frame_right, text='Pressure', font=("Roboto Medium", -14))
-			self.label_build_protocol_pipettor_pressure.place(x=320, y=130)
+			self.label_build_protocol_pipettor_pressure.place(x=420, y=130)
 			self.build_protocol_pipettor_pressure_sv = StringVar()
 			self.build_protocol_pipettor_pressure_sv.set('High')
 			self.optionmenu_build_protocol_pipettor_pressure = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_pipettor_pressure_sv, values=('High', 'Low'))
-			self.optionmenu_build_protocol_pipettor_pressure.place(x=305, y=160, width=80)
+			self.optionmenu_build_protocol_pipettor_pressure.place(x=385, y=160, width=120)
 			# Pipettor: Add
 			self.label_build_protocol_pipettor_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
-			self.label_build_protocol_pipettor_add.place(x=397, y=130)
+			self.label_build_protocol_pipettor_add.place(x=517, y=130)
 			self.button_build_protocol_pipettor_add = ctk.CTkButton(master=self.frame_right, text='', command=self.build_protocol_pipettor_add, fg_color='#4C7BD3') 
-			self.button_build_protocol_pipettor_add.place(x=390, y=160, width=40)
+			self.button_build_protocol_pipettor_add.place(x=510, y=160, width=40)
 			# Time:
 			self.label_build_protocol_time = ctk.CTkLabel(master=self.frame_right, text='Time', font=("Roboto Medium", -16))
 			self.label_build_protocol_time.place(x=5, y=220)
@@ -492,7 +542,7 @@ class App(ctk.CTk):
 			self.label_action_progress.place(x=360,y=235)
 			# Progress Bar
 			#self.progressbar_build_protocol = tkinter.ttk.Progressbar(master=self.frame_right, orient='horizontal', length=195, mode = 'determinate')
-			self.progressbar_build_protocol = ctk.CTkProgressBar(master=self.frame_right, orientation='horizontal', mode='determinate', width=195, progress_color='green', height=15)
+			self.progressbar_build_protocol = ctk.CTkProgressBar(master=self.frame_right, orientation='horizontal', mode='determinate', width=195, progress_color='green', height=25, corner_radius=0)
 			self.progressbar_build_protocol.set(0)
 			self.progressbar_build_protocol.place(x=350,y=265)
 			# Start
@@ -574,8 +624,17 @@ class App(ctk.CTk):
 			self.button_print = ctk.CTkButton(master=self.frame_right, text='Print', font=("Roboto Medium", -14), width=60, command=self.print_coordinate, height=25, fg_color='#4C7BD3')
 			self.button_print.place(x=5, y=470)
 		elif button_text == 'Service':
-			self.label_service_1 = ctk.CTkLabel(master=self.frame_right, text='Service', font=("Roboto Medium", -16))
-			self.label_service_1.grid(row=1, column=0, pady=10, padx=10)
+			# Service Topic
+			self.label_service_topic = ctk.CTkLabel(master=self.frame_right, text='Service Topic', font=("Roboto Medium", -16))
+			self.label_service_topic.place(x=10,y=10)
+			self.optionmenu_service_topic = ctk.CTkOptionMenu(master=self.frame_right, variable=self.service_topic_sv, values=('Aspirate', 'Dispense', 'Air Valve', 'Motion', 'Tip Eject', 'Suction Cups', 'Coordinates', 'Pipette Tip Leak', 'Loose Pipettor Mandrels', 'LEDs Turn Off'), command=self.callback_service_topic)
+			self.optionmenu_service_topic.place(x=130,y=10,width=200)
+			# Service Tips
+			self.textbox_service_tips = ctk.CTkTextbox(master=self.frame_right, width=540, height=300, font=("Roboto Medium", -12), state='disabled')
+			self.textbox_service_tips.place(x=10, y=45)
+			# Service Functions
+			self.label_service_functions = ctk.CTkLabel(master=self.frame_right, text="Service Functions", font=("Roboto Medium", -16))
+			self.label_service_functions.place(x=205, y=350)
 		elif button_text == 'Status':
 			# Unit A Status
 			self.radiobutton_status_unit_A_iv = tkinter.IntVar(0)
@@ -677,6 +736,95 @@ class App(ctk.CTk):
 			# 
 		#self.update()
 
+	def slider_image_led_intensity_event(self, value):
+		print(value)
+
+	def callback_image_led_sv(self, *args):
+		if self.image_led_sv.get() != 'Off':
+			self.slider_image_led_intensity.set(100)
+			self.slider_image_led_intensity.configure(state='normal')
+		else:
+			self.slider_image_led_intensity.set(0)
+			self.slider_image_led_intensity.configure(state='disabled')
+		if self.image_led_sv.get() != 'FAM':
+			self.brightfield_on = False
+		elif self.image_led_sv.get() == 'FAM':
+			self.brightfield_on = True
+
+	def auto_focus(self):
+		print("HERE")
+
+	def brightfield(self):
+		if self.brightfield_on:
+			self.image_filter_sv.set('HEX')
+			self.image_led_sv.set('Off')
+			self.brightfield_on = False
+		else:
+			self.image_filter_sv.set('HEX')
+			self.image_led_sv.set('FAM')
+			self.brightfield_on = True
+
+	def save_view(self):
+		print("HERE")
+
+	def load_view(self):
+		print("HERE")
+
+	def scan_chip(self):
+		print("HERE")
+
+	def home_imager(self):
+		print("HERE")
+
+	def callback_service_topic(self, event):
+		if self.service_topic_sv.get() == 'Aspirate':
+			self.textbox_service_tips.configure(state='normal')
+			self.textbox_service_tips.delete('0.0', 'end')
+			msg = """If Aspiration does not work please check the following:
+   - Valve 2
+       - Turn on Valve 2 (should hear a click)
+       - Turn off Valve 2 (should hear a click)
+   - Pneumatic Tubing
+       - Disconnect the pneumatic tubing (blue) from Valve 2 and run the aspirate service function to check if there is air flow, if so, put the tubing back in.
+       - Disconnect the pneumatic tubing (blue) from the Seyonic Pipettor head and run the aspirate service function to check if there is air flow, if so, put the tubing back in.
+       - Make sure that the pneumatic tubing (blue) going into and out of Valve 2 is securely set.
+       - Make sure that the pneumatic tubing (blue) going into the Seyonic Pipettor head is securely set
+   - Tip Blockage
+       - If aspiration takes longer than antisipated the tips may be blocked due to the creation of a vacuum between the pipette tips and the deck plate consumable, to fix this, modify the coordinates z positioning upwards to stop blockage.
+   - Seyonic Dispense Controller Software
+   - Pipette Filtered Tips Reached
+       - If the filters in the pipette tips come in contact with solution the pipette tip may stop apirating as expected and may need to be replaced
+			"""
+			self.textbox_service_tips.insert("0.0", msg)
+			self.textbox_service_tips.configure(state='disabled')
+		elif self.service_topic_sv.get() == 'Motion':
+			self.textbox_service_tips.configure(state='normal')
+			self.textbox_service_tips.delete('0.0', 'end')
+			msg = """If motion is not working check the following:
+   - Motors Are Engaged
+       - Motors are not engaged if relatively little effort is necessary to move the Seyonic Pipettor head freely along the upper gantry, the reader trays are easy to move, the imager is easily shifted by hand, etc.
+       - Motors are engaged if relatively little effort is used and motor modules are fixed
+   - E-Stop
+       - Check that the E-Stop is not pressed but is released
+       - Check that the E-Stop is securely connected to the unit
+   - Motor Relay
+       - Check that the relay labeled 'Motor' is either mechanically switched on or a green LED is lit up indicating it is on
+       - Use the Service Function to turn on and off the motor relay (should hear a click)
+   - Motor 36V Power Supply
+       - Check that the green LED on the 36V Motor Power Supply is on
+       - Check that there is a voltage close to 36V on the Motor Power Supply
+   - Door Lock 
+       - Check that the door lock mechanism is not inhibiting motor motion
+   - Local Uvicorn Server Running
+       - Ensure that the local Uvicorn Server is running by going to http.
+   - Chassis Controller Connected 
+       - Ensure that the USB for the Chassis Controller is connected to your PC
+   - Other
+       - Unplug the grey and teal ethernet cables from the Chassis Controller board, replug them in, and retest motor enagement after you hear a hum
+			"""
+			self.textbox_service_tips.insert("0.0", msg)
+			self.textbox_service_tips.configure(state='disabled')
+
 	def unit_A_status_radiobutton_event(self):
 		self.radiobutton_status_unit_B_iv.set(1)
 		self.radiobutton_status_unit_C_iv.set(1)
@@ -776,6 +924,13 @@ class App(ctk.CTk):
 				vol = int(split[1])
 				tip = int(split[4])
 				pressure = split[8].lower()
+				self.upper_gantry.dispense(vol, pressure=pressure)
+			elif "Mix" in action_msg:
+				split = action_msg.split()
+				vol = int(split[1])
+				tip = int(split[4])
+				pressure = split[8].lower()
+				self.upper_gantry.aspirate(vol, pressure=pressure, pipette_tip_type=tip)
 				self.upper_gantry.dispense(vol, pressure=pressure)
 			elif "Delay" in action_msg:
 				split = action_msg.split()
@@ -1101,6 +1256,7 @@ Times:
 ------------------------------------------------------""")
 		# Start timers for the thermocyclers
 		# Start a thread
+		self.button_start_thermocyclers.configure(state='disabled')
 		self.progressbar_thermocyclers.set(0)
 		thread = threading.Thread(target=self.thermocycle)
 		thread.start()
@@ -1154,8 +1310,10 @@ Times:
 			time.sleep(1)
 		# Thermocycle
 		cycles = [i for i in range(self.thermocyclers['cycles']['A'])]
+		self.thermocycler_cycles_sv.set(f"0/{len(cycles)}")
 		for cycle in cycles:
-			print(f"Cycle Number: {cycle+1}/{len(cycles)}")
+			#print(f"Cycle Number: {cycle+1}/{len(cycles)}")
+			self.thermocycler_cycles_sv.set(f"{cycle+1}/{len(cycles)}")
 			#self.progressbar_thermocyclers['value'] = 100 * (cycle+1) / len(cycles) - 10
 			self.progressbar_thermocyclers.set((cycle+1) / len(cycles))
 			if self.checkbox_thermocycler_A.get():
@@ -1191,6 +1349,7 @@ Times:
 			meersetter.change_temperature(4, 30, False)
 		# Thermocycling is done.
 		self.progressbar_thermocyclers.set(1)
+		self.button_start_thermocyclers.configure(state='normal')
 
 
 
@@ -1713,41 +1872,43 @@ Times:
 		self.server.stop()
 		self.destroy()
 
-	def backwards(self, event):
-		dy = int(self.dy.get())
-		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('backwards', dy,))
-		thread.start()
-		#self.upper_gantry.move_relative('backwards', dy)
 
-	def left(self, event):
-		dx = int(self.dx.get())
-		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('left', dx,))
-		thread.start()
-		#self.upper_gantry.move_relative('left', dx)
+	def backwards(self, event):
+		if self.button_optimize.cget('border_width') != 0:
+			dy = int(self.dy.get())
+			thread = threading.Thread(target=self.upper_gantry.move_relative, args=('backwards', dy,))
+			thread.start()
+
 
 	def forwards(self, event):
-		dy = int(self.dy.get())
-		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('forwards', dy,))
-		thread.start()
-		#self.upper_gantry.move_relative('forwards', dy)
+		if self.button_optimize.cget('border_width') != 0:
+			dy = int(self.dy.get())
+			thread = threading.Thread(target=self.upper_gantry.move_relative, args=('forwards', dy,))
+			thread.start()
+
+	def left(self, event):
+		if self.button_optimize.cget('border_width') != 0:
+			dx = int(self.dx.get())
+			thread = threading.Thread(target=self.upper_gantry.move_relative, args=('left', dx,))
+			thread.start()
 
 	def right(self, event):
-		dx = int(self.dx.get())
-		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('right', dx,))
-		thread.start()
-		#self.upper_gantry.move_relative('right', dx)
+		if self.button_optimize.cget('border_width') != 0:
+			dx = int(self.dx.get())
+			thread = threading.Thread(target=self.upper_gantry.move_relative, args=('right', dx,))
+			thread.start()
 
 	def up(self, event):
-		dz = int(self.dz.get())
-		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('up', dz,))
-		thread.start()
-		#self.upper_gantry.move_relative('up', dz)
+		if self.button_optimize.cget('border_width') != 0:
+			dz = int(self.dz.get())
+			thread = threading.Thread(target=self.upper_gantry.move_relative, args=('up', dz,))
+			thread.start()
 
 	def down(self, event):
-		dz = int(self.dz.get())
-		thread = threading.Thread(target=self.upper_gantry.move_relative, args=('down', dz,))
-		thread.start()
-		#self.upper_gantry.move_relative('down', dz)
+		if self.button_optimize.cget('border_width') != 0:
+			dz = int(self.dz.get())
+			thread = threading.Thread(target=self.upper_gantry.move_relative, args=('down', dz,))
+			thread.start()
 
 	def copy(self, event):
 		self.clipboard = []
@@ -1801,6 +1962,9 @@ Times:
 				pass
 			self.treeview_status.insert('', 'end', 'row{0}'.format(self.status_treeview_row_index), values=(cmpt, pm, s, p, n, fbd, c,))
 			self.status_treeview_row_index = self.status_treeview_row_index + 1
+	
+	def test(self, event):
+		print("HE")
 
 if __name__ == '__main__':
 	app = App()
