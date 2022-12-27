@@ -156,6 +156,30 @@ class App(ctk.CTk):
 		self.brightfield_on = False
 		self.thermocycler_cycles_sv = StringVar()
 		self.thermocycler_cycles_sv.set(str(self.thermocyclers['cycles']['A']))
+		self.settings_tip_tray_1_sv = StringVar()
+		self.settings_tip_tray_1_sv.set('1000')
+		self.settings_tip_tray_2_sv = StringVar()
+		self.settings_tip_tray_2_sv.set('1000')
+		self.settings_tip_tray_3_sv = StringVar()
+		self.settings_tip_tray_3_sv.set('1000')
+		self.settings_tip_tray_4_sv = StringVar()
+		self.settings_tip_tray_4_sv.set('1000')
+		self.settings_tip_tray_5_sv = StringVar()
+		self.settings_tip_tray_5_sv.set('50')
+		self.settings_tip_tray_6_sv = StringVar()
+		self.settings_tip_tray_6_sv.set('50')
+		self.settings_tip_tray_7_sv = StringVar()
+		self.settings_tip_tray_7_sv.set('50')
+		self.settings_tip_tray_8_sv = StringVar()
+		self.settings_tip_tray_8_sv.set('50')
+		self.settings_tip_tray_9_sv = StringVar()
+		self.settings_tip_tray_9_sv.set('50')
+		self.settings_tip_tray_10_sv = StringVar()
+		self.settings_tip_tray_10_sv.set('50')
+		self.settings_tip_tray_11_sv = StringVar()
+		self.settings_tip_tray_11_sv.set('50')
+		self.settings_tip_tray_12_sv = StringVar()
+		self.settings_tip_tray_12_sv.set('50')
 
 		# Volume in tips
 		self.pipettor_current_volume = 0
@@ -439,7 +463,7 @@ class App(ctk.CTk):
 			self.label_build_protocol_motion_consumable = ctk.CTkLabel(master=self.frame_right, text='Consumable', font=("Roboto Light", -14))
 			self.label_build_protocol_motion_consumable.place(x=163, y=70) #30,150
 			self.build_protocol_motion_consumable_sv = StringVar('')
-			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp", "Quant Strip", "Aux Heater"), font=("Roboto Light", -14)) 
+			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp Thermocycler", "Quant Strip", "Aux Heater"), font=("Roboto Light", -14)) 
 			self.optionmenu_build_protocol_motion_consumable.place(x=80, y=100, width=235)
 			# Motion: Tray
 			self.label_build_protocol_motion_tray = ctk.CTkLabel(master=self.frame_right, text='Tray', font=("Roboto Light", -14))
@@ -458,7 +482,7 @@ class App(ctk.CTk):
 			self.label_build_protocol_motion_tip.place(x=445, y=70)
 			self.build_protocol_motion_tip_sv = StringVar()
 			self.build_protocol_motion_tip_sv.set('1000')
-			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tip_sv, values=('1000', '50', '200', ''), font=("Roboto Light", -14)) 
+			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tip_sv, values=('1000', '50', '200'), font=("Roboto Light", -14)) 
 			self.optionmenu_build_protocol_motion_tip.place(x=435,y=100,width=70)
 			# Motion: Add
 			self.label_build_protocol_motion_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
@@ -684,8 +708,8 @@ class App(ctk.CTk):
 			# Unit Settings.
 			self.label_settings_unit = ctk.CTkLabel(master=self.frame_right, text="Unit Settings:", font=("Roboto Medium", -14))
 			self.label_settings_unit.place(x=115, y=35)
-			self.optionmenu_settings_unit = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_unit_sv, values=('A', 'B', 'C', 'D', 'E', 'F'))
-			self.optionmenu_settings_unit.place(x=205, y=35, width=80)
+			self.optionmenu_settings_unit = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_unit_sv, values=('A', 'B', 'C', 'D', 'E', 'F'), anchor='center')
+			self.optionmenu_settings_unit.place(x=225, y=35, width=80)
 			# Relative Move Settings
 			self.label_settings_relative_move = ctk.CTkLabel(master=self.frame_right, text="Relative Move Settings:", font=("Roboto Medium", -14))
 			self.label_settings_relative_move.place(x=50, y=75)
@@ -732,8 +756,70 @@ class App(ctk.CTk):
 			self.label_settings_heater_shaker_rpm.place(x=10, y=155)
 			self.entry_settings_heater_shaker_rpm = ctk.CTkEntry(master=self.frame_right, width=60, textvariable=self.heater_shaker_rpm, font=("Roboto Medium", -12))
 			self.entry_settings_heater_shaker_rpm.bind('<FocusOut>', self.callback_heater_shaker_rpm)
-			self.entry_settings_heater_shaker_rpm.place(x=205, y=155)
-			# 
+			self.entry_settings_heater_shaker_rpm.place(x=225, y=155)
+			# Tip Tray Box Settings.
+			self.label_settings_tip_tray = ctk.CTkLabel(master=self.frame_right, text="Tip Tray Box Settings:", font=("Roboto Bold", -14))
+			self.label_settings_tip_tray.place(x=55, y=195)
+			# Tip Tray Box Settings #1.
+			self.label_settings_tip_tray_1 = ctk.CTkLabel(master=self.frame_right, text='1', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_1.place(x=205, y=195)
+			self.optionmenu_settings_tip_tray_1 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_1_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_1.place(x=225, y=195, width=60)
+			# Tip Tray Box Settings #2.
+			self.label_settings_tip_tray_2 = ctk.CTkLabel(master=self.frame_right, text='2', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_2.place(x=295, y=195)
+			self.optionmenu_settings_tip_tray_2 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_2_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_2.place(x=315, y=195, width=60)
+			# Tip Tray Box Settings #3.
+			self.label_settings_tip_tray_3 = ctk.CTkLabel(master=self.frame_right, text='3', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_3.place(x=385, y=195)
+			self.optionmenu_settings_tip_tray_3 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_3_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_3.place(x=405, y=195, width=60)
+			# Tip Tray Box Settings #4.
+			self.label_settings_tip_tray_4 = ctk.CTkLabel(master=self.frame_right, text='4', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_4.place(x=475, y=195)
+			self.optionmenu_settings_tip_tray_4 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_4_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_4.place(x=495, y=195, width=60)
+			# Tip Tray Box Settings #5.
+			self.label_settings_tip_tray_5 = ctk.CTkLabel(master=self.frame_right, text='5', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_5.place(x=205, y=235)
+			self.optionmenu_settings_tip_tray_5 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_5_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_5.place(x=225, y=235, width=60)
+			# Tip Tray Box Settings #6.
+			self.label_settings_tip_tray_6 = ctk.CTkLabel(master=self.frame_right, text='6', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_6.place(x=295, y=235)
+			self.optionmenu_settings_tip_tray_6 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_6_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_6.place(x=315, y=235, width=60)
+			# Tip Tray Box Settings #7.
+			self.label_settings_tip_tray_7 = ctk.CTkLabel(master=self.frame_right, text='7', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_7.place(x=385, y=235)
+			self.optionmenu_settings_tip_tray_7 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_7_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_7.place(x=405, y=235, width=60)
+			# Tip Tray Box Settings #8.
+			self.label_settings_tip_tray_8 = ctk.CTkLabel(master=self.frame_right, text='8', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_8.place(x=475, y=235)
+			self.optionmenu_settings_tip_tray_8 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_8_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_8.place(x=495, y=235, width=60)
+			# Tip Tray Box Settings #9.
+			self.label_settings_tip_tray_9 = ctk.CTkLabel(master=self.frame_right, text='9', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_9.place(x=205, y=275)
+			self.optionmenu_settings_tip_tray_9 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_9_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_9.place(x=225, y=275, width=60)
+			# Tip Tray Box Settings #10.
+			self.label_settings_tip_tray_10 = ctk.CTkLabel(master=self.frame_right, text='10', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_10.place(x=295, y=275)
+			self.optionmenu_settings_tip_tray_10 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_10_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_10.place(x=315, y=275, width=60)
+			# Tip Tray Box Settings #11.
+			self.label_settings_tip_tray_11 = ctk.CTkLabel(master=self.frame_right, text='11', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_11.place(x=385, y=275)
+			self.optionmenu_settings_tip_tray_11 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_11_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_11.place(x=405, y=275, width=60)
+			# Tip Tray Box Settings #12.
+			self.label_settings_tip_tray_12 = ctk.CTkLabel(master=self.frame_right, text='12', font=("Roboto Bold", -14))
+			self.label_settings_tip_tray_12.place(x=475, y=275)
+			self.optionmenu_settings_tip_tray_12 = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_tip_tray_12_sv, values=('1000', '50', '200'), font=("Roboto Bold", -9))
+			self.optionmenu_settings_tip_tray_12.place(x=495, y=275, width=60)
 		#self.update()
 
 	def slider_image_led_intensity_event(self, value):
