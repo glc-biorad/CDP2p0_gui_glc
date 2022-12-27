@@ -1,16 +1,16 @@
 #!/usr/bin/env python3.8
 
-#import pythonnet
-#from pythonnet import load
+import pythonnet
+from pythonnet import load
 
-#load("coreclr")
+load("coreclr")
 
-#from utils import delay
-#from script import Script
-#from upper_gantry import UpperGantry
-#from meerstetter import Meerstetter
-#from fast_api_interface import FastAPIInterface
-#from uvicorn_server import UvicornServer
+from utils import delay
+from script import Script
+from upper_gantry import UpperGantry
+from meerstetter import Meerstetter
+from fast_api_interface import FastAPIInterface
+from uvicorn_server import UvicornServer
 
 # Needed to do for pandas:
 # python3.8 -m pip install openpyxl
@@ -98,11 +98,11 @@ class App(ctk.CTk):
 
 	def __init__(self):
 		super().__init__()
-		self.server = None #UvicornServer()
-		#self.server.start()
-		self.script = None #Script()
-		self.upper_gantry = None #UpperGantry()
-		self.fast_api_interface = None #FastAPIInterface()
+		self.server = UvicornServer()
+		self.server.start()
+		self.script = Script()
+		self.upper_gantry = UpperGantry()
+		self.fast_api_interface = FastAPIInterface()
 
 		# Copy/Paste
 		self.clipboard = []
@@ -139,6 +139,7 @@ class App(ctk.CTk):
 		self.heater_shaker_rpm.set('1300')
 		self.settings_unit_sv = StringVar()
 		self.settings_unit_sv.set('A')
+		self.settings_unit_sv.trace('w', self.callback_settings_unit_sv_changed)
 		self.use_thermocycler_A = tkinter.IntVar()
 		self.use_thermocycler_A.set(1)
 		self.use_thermocycler_B = tkinter.IntVar()
@@ -463,7 +464,7 @@ class App(ctk.CTk):
 			self.label_build_protocol_motion_consumable = ctk.CTkLabel(master=self.frame_right, text='Consumable', font=("Roboto Light", -14))
 			self.label_build_protocol_motion_consumable.place(x=163, y=70) #30,150
 			self.build_protocol_motion_consumable_sv = StringVar('')
-			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp Thermocycler", "Quant Strip", "Aux Heater"), font=("Roboto Light", -14)) 
+			self.optionmenu_build_protocol_motion_consumable = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_consumable_sv, values=("Reagent Cartridge", "Sample Rack", "Heater/Shaker", "Mag Separator", "Assay Strip", "Chiller", "Pre-Amp Thermocycler", "Quant Strip", "Aux Heater", "Tray CD NIPT", "Tray CD FF", "Tray CD Quant", "DG8 1000"), font=("Roboto Light", -14)) 
 			self.optionmenu_build_protocol_motion_consumable.place(x=80, y=100, width=235)
 			# Motion: Tray
 			self.label_build_protocol_motion_tray = ctk.CTkLabel(master=self.frame_right, text='Tray', font=("Roboto Light", -14))
@@ -482,7 +483,7 @@ class App(ctk.CTk):
 			self.label_build_protocol_motion_tip.place(x=445, y=70)
 			self.build_protocol_motion_tip_sv = StringVar()
 			self.build_protocol_motion_tip_sv.set('1000')
-			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tip_sv, values=('1000', '50', '200'), font=("Roboto Light", -14)) 
+			self.optionmenu_build_protocol_motion_tip = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_motion_tip_sv, values=('1000', '50', '200', 'None'), font=("Roboto Light", -14)) 
 			self.optionmenu_build_protocol_motion_tip.place(x=435,y=100,width=70)
 			# Motion: Add
 			self.label_build_protocol_motion_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
@@ -551,7 +552,7 @@ class App(ctk.CTk):
 			self.label_build_protocol_other_options.place(x=150, y=250)
 			self.build_protocol_other_sv = StringVar()
 			self.build_protocol_other_sv.set("Home Pipettor")
-			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=("Home Pipettor", "Move Relative Left", "Move Relative Right", "Move Relative Backwards", "Move Relative Forwards", "Move Relative Down", "Move Relative Up", 'Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet', "Pre-Amp Thermocycle (Not Functional)", "Generate Standard Droplets on DG8 1000 (Not Functional)", "Generate Standard Droplets on DG8 0100 (Not Functional)", "Generate Standard Droplets on DG8 0010 (Not Functional)", "Generate Standard Droplets on DG8 0001 (Not Functional)", "Generate Pico Droplets on DG8 1000 (Not Functional)", "Generate Pico Droplets on DG8 0100 (Not Functional)", "Generate Pico Droplets on DG8 0010 (Not Functional)", "Generate Pico Droplets on DG8 0001 (Not Functional)", "Move Lid (Not Functional)", "Move Chip (Not Functional)"))
+			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=("Home Pipettor", "Move Relative Left", "Move Relative Right", "Move Relative Backwards", "Move Relative Forwards", "Move Relative Down", "Move Relative Up", 'Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet', "Pre-Amp Thermocycle (Not Functional)", "Move Lid (Not Functional)", "Move Chip (Not Functional)"))
 			self.optionmenu_build_protocol_other.place(x=85, y=280, width=200)
 			# Other: Add
 			self.label_build_protocol_time_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
@@ -708,7 +709,7 @@ class App(ctk.CTk):
 			# Unit Settings.
 			self.label_settings_unit = ctk.CTkLabel(master=self.frame_right, text="Unit Settings:", font=("Roboto Medium", -14))
 			self.label_settings_unit.place(x=115, y=35)
-			self.optionmenu_settings_unit = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_unit_sv, values=('A', 'B', 'C', 'D', 'E', 'F'), anchor='center')
+			self.optionmenu_settings_unit = ctk.CTkOptionMenu(master=self.frame_right, variable=self.settings_unit_sv, values=('A', 'B', 'C', 'D', 'E', 'F'), anchor='center', state='disabled')
 			self.optionmenu_settings_unit.place(x=225, y=35, width=80)
 			# Relative Move Settings
 			self.label_settings_relative_move = ctk.CTkLabel(master=self.frame_right, text="Relative Move Settings:", font=("Roboto Medium", -14))
@@ -826,10 +827,23 @@ class App(ctk.CTk):
 		print(value)
 
 	def callback_image_led_sv(self, *args):
+		colors = {
+			'HEX': 6,
+			'FAM': 2,
+			'ATTO590': 1,
+			'ALEXA405': 4,
+			'CY5.5': 3,
+			'CY5': 5,
+			}
 		if self.image_led_sv.get() != 'Off':
 			self.slider_image_led_intensity.set(100)
 			self.slider_image_led_intensity.configure(state='normal')
+			for color, channel in colors.items():
+				self.fast_api_interface.reader.led.off(5, channel)
+			self.fast_api_interface.reader.led.on(5, colors[self.image_led_sv.get()])
 		else:
+			for color, channel in colors.items():
+				self.fast_api_interface.reader.led.off(5, channel)
 			self.slider_image_led_intensity.set(0)
 			self.slider_image_led_intensity.configure(state='disabled')
 		if self.image_led_sv.get() != 'FAM':
@@ -984,6 +998,17 @@ class App(ctk.CTk):
 					consumable = "Quant Strip"
 				elif consumable == 'Aux':
 					consumable = "Aux Heater"
+				elif consumable == "Tray" and split[3] == 'CD':
+					if split[4] == 'NIPT':
+						consumable = 'Tray CD NIPT'
+					elif split[4] == 'Quant':
+						consumable = 'Tray CD Quant'
+					elif split[4] == 'FF':
+						consumable = 'Tray CD FF'
+					split = action_msg.split()
+					split = split[3:]
+				elif consumable == 'DG8' and split[3] == '1000':
+					consumable = "DG8 1000"
 				else:
 					consumable = consumable
 				# Check if a tray is specified
@@ -995,10 +1020,16 @@ class App(ctk.CTk):
 					column = int(split[index+1])
 				try:
 					pipette_tip_type = int(split[-3])
-					print(pipette_tip_type)
+					if pipette_tip_type == 'None':
+						pipette_tip_type = None
 				except:
 					pipette_tip_type = None
-				self.upper_gantry.move_pipettor_new(consumable=consumable, tray=tray, row=column, pipette_tip_type=pipette_tip_type, use_drip_plate=False)
+				if consumable.split()[0] == 'DG8' and column == 3 and pipette_tip_type == None:
+					from coordinate import coordinates
+					dz = coordinates['deck_plate']['dg8']['dz']
+					self.upper_gantry.move_pipettor_new(consumable=consumable, tray=tray, row=column, pipette_tip_type=1000, use_drip_plate=False, relative_moves=[0,0,-dz,0])
+				else:
+					self.upper_gantry.move_pipettor_new(consumable=consumable, tray=tray, row=column, pipette_tip_type=pipette_tip_type, use_drip_plate=False)
 			elif "Aspirate" in action_msg:
 				split = action_msg.split()
 				vol = int(split[1])
@@ -1041,30 +1072,10 @@ class App(ctk.CTk):
 				self.script.elution(self.upper_gantry, full_protocol=False)
 			elif "Extraction" in action_msg:
 				self.script.extraction(self.upper_gantry, full_protocol=False)
-			elif "Generate Standard Droplets on DG8 1000 (Not Functional)" in action_msg:
-				#self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
-				print('Not Functional')
-			elif "Generate Standard Droplets on DG8 0100 (Not Functional)" in action_msg:
-				#self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
-				print('Not Functional')
-			elif "Generate Standard Droplets on DG8 0010 (Not Functional)" in action_msg:
-				#self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
-				print('Not Functional')
-			elif "Generate Standard Droplets on DG8 0001 (Not Functional)" in action_msg:
-				#self.script.generate_droplets_and_load(self.upper_gantry, 'standard')
-				print('Not Functional')
-			elif "Generate Pico Droplets on DG8 1000 (Not Functional)" in action_msg:
-				#self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
-				print('Not functional')
-			elif "Generate Pico Droplets on DG8 0100 (Not Functional)" in action_msg:
-				#self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
-				print('Not functional')
-			elif "Generate Pico Droplets on DG8 0010 (Not Functional)" in action_msg:
-				#self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
-				print('Not functional')
-			elif "Generate Pico Droplets on DG8 0001 (Not Functional)" in action_msg:
-				#self.script.generate_droplets_and_load(self.upper_gantry, 'pico')
-				print('Not functional')
+			elif "Generate Standard Droplets" in action_msg:
+				self.upper_gantry.generate_droplets('standard')
+			elif "Generate Pico Droplets" in action_msg:
+				self.upper_gantry.generate_droplets('pico')
 			elif "Assay Prep" in action_msg:
 				self.script.assay_prep(self.upper_gantry)
 			elif "Engage Magnet" in action_msg:
@@ -1253,6 +1264,13 @@ class App(ctk.CTk):
 
 	def update_coordinate(self):
 		print("Update Coordinate")
+		x,y,z,dp = self.upper_gantry.get_position()
+		print(x)
+		print(y)
+		print(z)
+		print(dp)
+		unit = self.settings_unit_sv.get()
+		# Write this to both coordinate.py and to coordinate_{unit}.py
 
 	def print_coordinate(self):
 		self.upper_gantry.print_position()
@@ -2049,11 +2067,38 @@ Times:
 			self.treeview_status.insert('', 'end', 'row{0}'.format(self.status_treeview_row_index), values=(cmpt, pm, s, p, n, fbd, c,))
 			self.status_treeview_row_index = self.status_treeview_row_index + 1
 	
+	def callback_settings_unit_sv_changed(self, *args):
+		#import os
+		unit = self.settings_unit_sv.get()
+		# Copy the unit coordinate file to coordinate.py
+		#coordinate_file_name = 'coordinate.py'
+		# Remove old backup.
+		#os.system("del coordinate_backup.py")
+		# Make a backup of this file if it exists.
+		#os.system(f"copy {coordinate_file_name} coordinate_backup.py")
+		# Remove it if it exists.
+		#os.system(f"del {coordinate_file_name}")
+		# Copy the correct coordinate file for the unit.
+		#os.system(f"copy coordinate_{unit}.py {coordinate_file_name}")
+
+
 	def test(self, event):
 		print("HE")
 
 if __name__ == '__main__':
 	app = App()
+	unit = 'A'
+	app.settings_unit_sv.set(unit)
+	# Copy the unit coordinate file to coordinate.py
+	coordinate_file_name = 'coordinate.py'
+	# Remove old backup.
+	os.system("del coordinate_backup.py")
+	# Make a backup of this file if it exists.
+	os.system(f"copy {coordinate_file_name} coordinate_backup.py")
+	# Remove it if it exists.
+	os.system(f"del {coordinate_file_name}")
+	# Copy the correct coordinate file for the unit.
+	os.system(f"copy coordinate_{unit}.py {coordinate_file_name}")
 	app.iconbitmap('bio-rad-logo.ico')
 	app.bind('<Return>', app.enter)
 	app.bind('<Up>', app.backwards)
