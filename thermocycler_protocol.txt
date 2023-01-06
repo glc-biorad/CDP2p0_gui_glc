@@ -1,55 +1,56 @@
 ------------------------------------------------------
 Thermocycler Protocol
 ------------------------------------------------------
-Date: 2022-12-07
-User: glopezca
+Date: 2023-01-04
+User: u112958
 
 Thermocycler A:
 ---------------
-Cycles: 45
+Cycles: 40
 Temperatures:
-	Denature: 92 C
-	Anneal: 55 C
+	Denature: 84 C
+	Anneal: 50 C
 	Extension: 84 C
 Times:
-	Denature: 5 min
+	Denature: 3 min
 	Anneal: 80 sec
 	Extension: 40 sec
 
 Thermocycler B:
 ---------------
-Cycles: 45
+Cycles: 40
 Temperatures:
-	Denature: 92 C
-	Anneal: 60 C
-	Extension: 95 C
+	Denature: 84 C
+	Anneal: 50 C
+	Extension: 84 C
 Times:
-	Denature: 10 min
+	Denature: 3 min
 	Anneal: 80 sec
 	Extension: 40 sec
 
 Thermocycler C:
 ---------------
-Cycles: 45
+Cycles: 40
 Temperatures:
-	Denature: 92 C
-	Anneal: 55 C
+	Denature: 84 C
+	Anneal: 52 C
 	Extension: 84 C
 Times:
-	Denature: 5 min
+	Denature: 3 min
 	Anneal: 80 sec
 	Extension: 40 sec
 
 Thermocycler D:
 ---------------
-Cycles: 45
+Cycles: 40
 Temperatures:
-	Denature: 92 C
-	Anneal: 55 C
+	Denature: 84 C
+	Anneal: 52 C
 	Extension: 84 C
 Times:
-	Denature: 5 min
+	Denature: 3 min
 	Anneal: 80 sec
 	Extension: 40 sec
+
 
 ------------------------------------------------------
