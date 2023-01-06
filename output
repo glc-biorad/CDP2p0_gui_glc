@@ -1,0 +1,292 @@
+LOG-START
+	- Module: upper_gantry.py
+	- Function: home_pipettor_deprecated
+	- Message: homing pipettor from a fresh restart location
+	- Current Time: 14:13:40
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: home_pipettor_deprecated
+	- Message: homping complete.
+	- Current Time: 14:13:51
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: tip_pickup_deprecated
+	- Message: picking up tips in tray 3 row 1 using a tip size of None microliters from home.
+	- Current Time: 14:13:51
+
+
+LOG-START
+	- Module: upper_gantry_coordinate.py
+	- Function: upper_gantry_coordinate
+	- Message: Working on coordinate for tip_trays_tray3_row1
+	- Current Time: 14:13:51
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: tip_pickup_deprecated
+	- Message: done picking up tips.
+	- Current Time: 14:14:6
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message: moveing pipettor to sample_loading_tray2 from tip_trays_tray3_row1
+	- Current Time: 14:14:6
+
+
+LOG-START
+	- Module: upper_gantry_coordinate.py
+	- Function: upper_gantry_coordinate
+	- Message: Working on coordinate for sample_loading_tray2
+	- Current Time: 14:14:6
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message:  done
+	- Current Time: 14:14:14
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 250 microliters using a 1000 microliter tip at sample_loading_tray2.
+	- Current Time: 14:14:14
+
+
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration complete.
+	- Current Time: 14:14:22
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message: moveing pipettor to mag_separator_row4 from sample_loading_tray2
+	- Current Time: 14:14:22
+
+
+LOG-START
+	- Module: upper_gantry_coordinate.py
+	- Function: upper_gantry_coordinate
+	- Message: Working on coordinate for mag_separator_row4
+	- Current Time: 14:14:23
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message:  done
+	- Current Time: 14:14:41
+
+
+Dispense Volume = 2750
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message: moveing pipettor to reagent_cartridge_tray3_row1 from mag_separator_row4
+	- Current Time: 14:14:48
+
+
+LOG-START
+	- Module: upper_gantry_coordinate.py
+	- Function: upper_gantry_coordinate
+	- Message: Working on coordinate for reagent_cartridge_tray3_row1
+	- Current Time: 14:14:48
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message:  done
+	- Current Time: 14:15:6
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 250 microliters using a 1000 microliter tip at reagent_cartridge_tray3_row1.
+	- Current Time: 14:15:6
+
+
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration complete.
+	- Current Time: 14:15:14
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message: moveing pipettor to mag_separator_row4 from reagent_cartridge_tray3_row1
+	- Current Time: 14:15:14
+
+
+LOG-START
+	- Module: upper_gantry_coordinate.py
+	- Function: upper_gantry_coordinate
+	- Message: Working on coordinate for mag_separator_row4
+	- Current Time: 14:15:15
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message:  done
+	- Current Time: 14:15:32
+
+
+Dispense Volume = 2750
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 50 microliters using a 1000 microliter tip at mag_separator_row4.
+	- Current Time: 14:15:39
+
+
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration complete.
+	- Current Time: 14:15:46
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message: moveing pipettor to tray_out_location_tray1 from mag_separator_row4
+	- Current Time: 14:15:46
+
+
+LOG-START
+	- Module: upper_gantry_coordinate.py
+	- Function: upper_gantry_coordinate
+	- Message: Working on coordinate for tray_out_location_tray1
+	- Current Time: 14:15:47
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor_deprecated
+	- Message:  done
+	- Current Time: 14:16:0
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: tip_pickup_deprecated
+	- Message: picking up tips in tray 3 row 1 using a tip size of 1000 microliters from tray_out_location_tray1.
+	- Current Time: 14:16:0
+
+
+LOG-START
+	- Module: upper_gantry_coordinate.py
+	- Function: upper_gantry_coordinate
+	- Message: Working on coordinate for tip_trays_tray3_row1
+	- Current Time: 14:16:0
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: tip_pickup_deprecated
+	- Message: done picking up tips.
+	- Current Time: 14:16:21
+
+
+LOG-START
+	- Module: upper_gantry.py
+	- Function: home_pipettor_deprecated
+	- Message: homing pipettor from tip_trays_tray3_row1
+	- Current Time: 14:16:21
+
+
+LOG-END
+	- Module: upper_gantry.py
+	- Function: home_pipettor_deprecated
+	- Message: homping complete.
+	- Current Time: 14:16:57
+
+
+WARNING (utils, check_limit): -300000 >= 0 is False...
+WARNING (utils, check_limit): -1100000 >= 0 is False...
+WARNING (utils, check_limit): -1100000 <= -1200000 is False...
+WARNING (utils, check_limit): 0 <= -100000 is False...
+WARNING (utils, check_limit): 0 <= -10 is False...
+
+Starting for channel 1
+<5,0,0
+Starting for channel 2
+<5,0,0
+Starting for channel 3
+<5,0,0
+Starting for channel 4
+<5,0,0
+Starting for channel 5
+<5,0,0
+Starting for channel 6
+<5,0,0
+
+LOG-START
+	- Module: reader.py
+	- Function: home_reader
+	- Message: Homing the reader module (filter wheel, Z, Y, X axes, trays, and heaters)
+	- Current Time: 14:17:53
+
+
+LOG-END
+	- Module: reader.py
+	- Function: home_reader
+	- Message: Homing reader module complete.
+	- Current Time: 14:19:1
+
+

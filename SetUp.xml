@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <appSettings>
+    <!--   User application and configured property settings go here.-->
+    <!--   Example: <add key="settingName" value="settingValue"/> -->
+    <add key="\" value="" />
+    <add key="cboBoardNr.SelectedIndex" value="1" />
+    <add key="chkAir.Checked" value="True" />
+    <add key="chkDualPressure.Checked" value="False" />
+    <add key="chkGantry.Checked" value="False" />
+    <add key="chkMettler.Checked" value="False" />
+    <add key="chkInEnable1.Checked" value="True" />
+    <add key="chkInEnable2.Checked" value="True" />
+    <add key="chkInEnable3.Checked" value="True" />
+    <add key="chkInEnable4.Checked" value="True" />
+    <add key="chkInEnable5.Checked" value="True" />
+    <add key="chkInEnable6.Checked" value="False" />
+    <add key="chkInEnable7.Checked" value="False" />
+    <add key="chkInEnable8.Checked" value="False" />
+    <add key="chkOutEnable1.Checked" value="True" />
+    <add key="chkOutEnable2.Checked" value="True" />
+    <add key="chkOutEnable3.Checked" value="False" />
+    <add key="chkOutEnable4.Checked" value="False" />
+    <add key="chkOutEnable5.Checked" value="False" />
+    <add key="chkOutEnable6.Checked" value="False" />
+    <add key="chkOutEnable7.Checked" value="False" />
+    <add key="chkOutEnable8.Checked" value="False" />
+    <add key="chkRotaryTab.Checked" value="False" />
+    <add key="chkSyncEnable.Checked" value="False" />
+    <add key="chkUserDiaMed.Checked" value="False" />
+    <add key="chkUser1.Checked" value="False" />
+    <add key="chkUser2.Checked" value="False" />
+    <add key="chkUser3.Checked" value="False" />
+    <add key="chkRabbit.Checked" value="False" />
+    <add key="chkRefillEnable.Checked" value="False" />
+    <add key="chkValve_2.Checked" value="False" />
+    <add key="chkValve_3.Checked" value="False" />
+    <add key="ComboBox1.DisplayMember" value="" />
+    <add key="ComboBox1.ValueMember" value="" />
+    <add key="DataGrid1.CaptionText" value="" />
+    <add key="DataPathName" value="MyDocuments\Seyonic\Dispenser_Data" />
+    <add key="MethodPathName" value="MyDocuments\Seyonic\Methods" />
+    <add key="DomainUpDown_COMPortRS232Axes.SelectedIndex" value="-1" />
+    <add key="Enabled_Channels" value="1" />
+    <add key="EnabledChannels(1)" value="1" />
+    <add key="EnabledChannels(2)" value="0" />
+    <add key="EnabledChannels(3)" value="0" />
+    <add key="EnabledChannels(4)" value="0" />
+    <add key="EnabledChannels(5)" value="0" />
+    <add key="EnabledChannels(6)" value="0" />
+    <add key="EnabledChannels(7)" value="0" />
+    <add key="EnabledChannels(8)" value="0" />
+    <add key="EnabledChannels(9)" value="0" />
+    <add key="EnabledChannels(10)" value="0" />
+    <add key="EnabledChannels(11)" value="0" />
+    <add key="EnabledChannels(12)" value="0" />
+    <add key="EnabledChannels(13)" value="0" />
+    <add key="EnabledChannels(14)" value="0" />
+    <add key="Form1.AutoScale" value="False" />
+    <add key="GroupBox5.CausesValidation" value="True" />
+    <add key="HelpProvider1.HelpNamespace" value="Dispenserhelp.htm" />
+    <add key="MenuItem6.RadioCheck" value="True" />
+    <add key="mnuUserAdmin.Checked" value="False" />
+    <add key="mnuUserDiaMed.Checked" value="False" />
+    <add key="mnuUserFactory.Checked" value="False" />
+    <add key="mnuUserPower.Checked" value="False" />
+    <add key="mnuUserUser.Checked" value="True" />
+    <add key="nudZ_Abs_Max.Value" value="-55" />
+    <add key="nudTravel_Height.Value" value="5" />
+    <add key="nudZMinAbs.Value" value="0" />
+    <add key="nudTravelHeight.Value" value="0" />
+    <add key="OpenCalFile.InitialDirectory" value="" />
+    <add key="RadioButton1.Checked" value="False" />
+    <add key="radPriming_Standard.Checked" value="True" />
+    <add key="radBanseok.Checked" value="False" />
+    <add key="radHudson.Checked" value="False" />
+    <add key="radUnimec.Checked" value="False" />
+    <add key="radEVO.Checked" value="False" />
+    <add key="radIris.Checked" value="False" />
+    <add key="radOMNI.Checked" value="False" />
+    <add key="radFestoRobot.Checked" value="False" />
+    <add key="radRS232.Checked" value="True" />
+    <add key="radZymarkProtocol.Checked" value="False" />
+    <add key="SaveCalFile.InitialDirectory" value="" />
+    <add key="ToolTip1.Active" value="True" />
+    <add key="TrackBar1.Value" value="0" />
+    <add key="TrkAutozero.Value" value="3" />
+    <add key="ttpSetAll.Active" value="True" />
+    <add key="txtCdHi_In1.Text" value="&amp;H65" />
+    <add key="txtCdHi_In2.Text" value="&amp;H65" />
+    <add key="txtCdHi_In3.Text" value="&amp;H65" />
+    <add key="txtCdHi_In4.Text" value="&amp;H65" />
+    <add key="txtCdHi_In5.Text" value="&amp;H65" />
+    <add key="txtCdHi_In6.Text" value="&amp;H65" />
+    <add key="txtCdHi_In7.Text" value="&amp;H65" />
+    <add key="txtCdHi_In8.Text" value="&amp;H65" />
+    <add key="txtCdHi_Out1.Text" value="&amp;H65" />
+    <add key="txtCdHi_Out2.Text" value="&amp;H65" />
+    <add key="txtCdHi_Out3.Text" value="&amp;H65" />
+    <add key="txtCdHi_Out4.Text" value="&amp;H65" />
+    <add key="txtCdHi_Out5.Text" value="&amp;H65" />
+    <add key="txtCdHi_Out6.Text" value="&amp;H65" />
+    <add key="txtCdHi_Out7.Text" value="&amp;H65" />
+    <add key="txtCdHi_Out8.Text" value="&amp;H65" />
+    <add key="txtCdLo_In1.Text" value="&amp;H00" />
+    <add key="txtCdLo_In2.Text" value="&amp;H01" />
+    <add key="txtCdLo_In3.Text" value="&amp;H02" />
+    <add key="txtCdLo_In4.Text" value="&amp;H03" />
+    <add key="txtCdLo_In5.Text" value="&amp;H04" />
+    <add key="txtCdLo_In6.Text" value="&amp;H06" />
+    <add key="txtCdLo_In7.Text" value="&amp;H07" />
+    <add key="txtCdLo_In8.Text" value="&amp;H08" />
+    <add key="txtCdLo_Out1.Text" value="&amp;H03" />
+    <add key="txtCdLo_Out2.Text" value="&amp;H04" />
+    <add key="txtCdLo_Out3.Text" value="&amp;H03" />
+    <add key="txtCdLo_Out4.Text" value="&amp;H04" />
+    <add key="txtCdLo_Out5.Text" value="&amp;H05" />
+    <add key="txtCdLo_Out6.Text" value="&amp;H06" />
+    <add key="txtCdLo_Out7.Text" value="&amp;H07" />
+    <add key="txtCdLo_Out8.Text" value="&amp;H08" />
+    <add key="txtD_IN1.Text" value="Busy" />
+    <add key="txtD_IN2.Text" value="Error" />
+    <add key="txtD_IN3.Text" value="LLD_First" />
+    <add key="txtD_IN4.Text" value="Reset" />
+    <add key="txtD_IN5.Text" value="Trigger" />
+    <add key="txtD_IN6.Text" value=" Input 6" />
+    <add key="txtD_IN7.Text" value=" Input 7" />
+    <add key="txtD_IN8.Text" value=" Input 8" />
+    <add key="txtD_OUT1.Text" value="Reset" />
+    <add key="txtD_OUT2.Text" value="Trigger" />
+    <add key="txtD_OUT3.Text" value=" Output 3" />
+    <add key="txtD_OUT4.Text" value=" Output 4" />
+    <add key="txtD_OUT5.Text" value=" Output 5" />
+    <add key="txtD_OUT6.Text" value=" Output 6" />
+    <add key="txtD_OUT7.Text" value=" Output 7" />
+    <add key="txtD_OUT8.Text" value=" Output 8" />
+    <add key="txtPosPressureSetpoint.CausesValidation" value="True" />
+    <add key="txtNegPressureSetPoint.Text" value="-100" />
+    <add key="txtPosPressureSetPoint.Text" value="+100" />
+    <add key="txtUserLevel.Text" value="Service" />
+    <add key="updBaud.AccessibleDescription" value="(None)" />
+    <add key="updBaud.AccessibleName" value="(None)" />
+    <add key="updBaudrate.AccessibleDescription" value="(None)" />
+    <add key="updBaudrate.AccessibleName" value="(None)" />
+    <add key="updBaudrate.SelectedIndex" value="1" />
+    <add key="updCOM.SelectedIndex" value="0" />
+    <add key="cboCOM.SelectedIndex" value="0" />
+    <add key="cboGantryCOM.SelectedIndex" value="-1" />
+    <add key="cboMettlerCOM.SelectedIndex" value="-1" />
+    <add key="GantryStepsMinX" value="0" />
+    <add key="GantryStepsMaxX" value="108" />
+    <add key="GantryStepsMinY" value="0" />
+    <add key="GantryStepsMaxY" value="0" />
+    <add key="GantryStepsMinZ" value="-98" />
+    <add key="GantryStepsMaxZ" value="0" />
+    <add key="chkMettler.Checked" value="False" />
+    <add key="radMettler.Checked" value="False" />
+    <add key="radSartorius.Checked" value="False" />
+    <add key="radKern.Checked" value="True" />
+    <add key="radOhaus.Checked" value="False" />
+    <add key="CommaToolstripMenuItem.Checked" value="True" />
+  </appSettings>
+</configuration>

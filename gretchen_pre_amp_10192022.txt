@@ -1,0 +1,866 @@
+LOG-START
+	- Module: CDP2p0.py
+	- Function: __main__
+	- Message: Starting script C:\Users\u112958\source\repos\CDP2p0_Software_and_Scripting\CDP2p0.py
+	- Current Time: 17:42:6
+LOG-START
+	- Module: upper_gantry.py
+	- Function: upper_gantry
+	- Message: Initializing the Upper Gantry.
+	- Current Time: 17:42:6
+	- Message: Turning on Relay 8 - Heater/Shaker and Chiller.
+	- Current Time: 17:42:7
+LOG-END
+	- Module: upper_gantry.py
+	- Function: upper_gantry
+	- Message: Initialization of the Upper Gantry is complete.
+	- Current Time: 17:42:7
+LOG-START
+	- Module: gretchen.py
+	- Function: pre_amp_workflow
+	- Message: Starting Gretchen's Pre-Amp Workflow on 10/19/2022 at 5:42:7 pm
+	- Current Time: 17:42:7
+LOG-START
+	- Module: upper_gantry.py
+	- Function: tip_pickup
+	- Message: Picking up tips from tray C, row 12
+	- Current Time: 17:42:7
+	- Message: The X axis is at -116500 of -116500 microsteps
+	- Current Time: 17:42:21
+	- Message: -116500 reached in 2.024843454360962 seconds for pipettor_gantry module along 1
+	- Current Time: 17:42:21
+	- Message: The Z axis is at -437065 of -1479000 microsteps
+	- Current Time: 17:42:27
+	- Message: The Z axis is at -1418848 of -1479000 microsteps
+	- Current Time: 17:42:29
+	- Message: The Z axis is at -1479000 of -1479000 microsteps
+	- Current Time: 17:42:31
+	- Message: -1479000 reached in 6.497725963592529 seconds for pipettor_gantry module along 3
+	- Current Time: 17:42:31
+	- Message: The Z axis is at -1046782 of 0 microsteps
+	- Current Time: 17:42:38
+	- Message: The Z axis is at -65055 of 0 microsteps
+	- Current Time: 17:42:40
+	- Message: The Z axis is at -9 of 0 microsteps
+	- Current Time: 17:42:42
+	- Message: The Z axis is at -9 of 0 microsteps
+	- Current Time: 17:42:44
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:42:50
+	- Message: 0 reached in 2.018894910812378 seconds for pipettor_gantry module along 3
+	- Current Time: 17:42:50
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:42:55
+	- Message: 0 reached in 19.014091730117798 seconds for pipettor_gantry module along 3
+	- Current Time: 17:42:55
+LOG-END
+	- Module: upper_gantry.py
+	- Function: tip_pickup
+	- Message: 50 uL tips picked up from tray C, row 12
+	- Current Time: 17:42:55
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to reagent_cartridge_tray2_row1 with 50 uL tips.
+	- Current Time: 17:42:55
+	- Message: The X axis is at -257999 of -258000 microsteps
+	- Current Time: 17:43:9
+	- Message: The X axis is at -258000 of -258000 microsteps
+	- Current Time: 17:43:11
+	- Message: -258000 reached in 4.248904466629028 seconds for pipettor_gantry module along 1
+	- Current Time: 17:43:11
+	- Message: The Z axis is at -432017 of -1255000 microsteps
+	- Current Time: 17:43:17
+	- Message: The Z axis is at -1249055 of -1255000 microsteps
+	- Current Time: 17:43:19
+	- Message: The Z axis is at -1255000 of -1255000 microsteps
+	- Current Time: 17:43:21
+	- Message: -1255000 reached in 6.477890968322754 seconds for pipettor_gantry module along 3
+	- Current Time: 17:43:21
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moved pipettor to reagent_cartridge_tray2_row1.
+	- Current Time: 17:43:21
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 15 microliters using a 50 microliter tip at reagent_cartridge_tray2_row1.
+	- Current Time: 17:43:21
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:43:22
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:43:24
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:43:29
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:43:30
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration complete.
+	- Current Time: 17:43:32
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to pcr_thermocycler_row1 with 50 uL tips.
+	- Current Time: 17:43:32
+	- Message: The Z axis is at -822683 of 0 microsteps
+	- Current Time: 17:43:38
+	- Message: The Z axis is at -5616 of 0 microsteps
+	- Current Time: 17:43:40
+	- Message: The Z axis is at -9 of 0 microsteps
+	- Current Time: 17:43:43
+	- Message: The Z axis is at -9 of 0 microsteps
+	- Current Time: 17:43:45
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:43:51
+	- Message: 0 reached in 2.0239057540893555 seconds for pipettor_gantry module along 3
+	- Current Time: 17:43:51
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:43:55
+	- Message: 0 reached in 19.0382878780365 seconds for pipettor_gantry module along 3
+	- Current Time: 17:43:55
+	- Message: The Drip Plate axis is at -550385 of -1198000 microsteps
+	- Current Time: 17:44:1
+	- Message: The Drip Plate axis is at -1198000 of -1198000 microsteps
+	- Current Time: 17:44:3
+	- Message: -1198000 reached in 4.251101732254028 seconds for pipettor_gantry module along 4
+	- Current Time: 17:44:3
+	- Message: The X axis is at -450214 of -452300 microsteps
+	- Current Time: 17:44:14
+	- Message: The X axis is at -452300 of -452300 microsteps
+	- Current Time: 17:44:16
+	- Message: -452300 reached in 4.24987530708313 seconds for pipettor_gantry module along 1
+	- Current Time: 17:44:16
+	- Message: The drip plate is in use.
+	- Current Time: 17:44:16
+	- Message: The Drip Plate axis is at -671669 of -400000 microsteps
+	- Current Time: 17:44:22
+	- Message: The Drip Plate axis is at -400000 of -400000 microsteps
+	- Current Time: 17:44:24
+	- Message: -400000 reached in 4.261173963546753 seconds for pipettor_gantry module along 4
+	- Current Time: 17:44:24
+	- Message: The Z axis is at -431933 of -890000 microsteps
+	- Current Time: 17:44:30
+	- Message: The Z axis is at -890000 of -890000 microsteps
+	- Current Time: 17:44:33
+	- Message: -890000 reached in 4.252089262008667 seconds for pipettor_gantry module along 3
+	- Current Time: 17:44:33
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moved pipettor to pcr_thermocycler_row1.
+	- Current Time: 17:44:33
+Dispense Volume = 200
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:44:33
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:44:34
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:44:39
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:44:40
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to mag_separator_row1 with 50 uL tips.
+	- Current Time: 17:44:42
+	- Message: The Z axis is at -463027 of 0 microsteps
+	- Current Time: 17:44:48
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:44:51
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:44:53
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:44:59
+	- Message: 0 reached in 2.024989366531372 seconds for pipettor_gantry module along 3
+	- Current Time: 17:44:59
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:45:3
+	- Message: 0 reached in 16.779571294784546 seconds for pipettor_gantry module along 3
+	- Current Time: 17:45:3
+	- Message: The Drip Plate axis is at -926670 of -1198000 microsteps
+	- Current Time: 17:45:9
+	- Message: The Drip Plate axis is at -1198000 of -1198000 microsteps
+	- Current Time: 17:45:11
+	- Message: -1198000 reached in 4.250824928283691 seconds for pipettor_gantry module along 4
+	- Current Time: 17:45:11
+	- Message: The X axis is at -398500 of -398500 microsteps
+	- Current Time: 17:45:22
+	- Message: -398500 reached in 2.021423816680908 seconds for pipettor_gantry module along 1
+	- Current Time: 17:45:22
+	- Message: The drip plate is in use.
+	- Current Time: 17:45:22
+	- Message: The Drip Plate axis is at -654923 of 0 microsteps
+	- Current Time: 17:45:28
+	- Message: The Drip Plate axis is at -26 of 0 microsteps
+	- Current Time: 17:45:30
+	- Message: The Drip Plate axis is at -26 of 0 microsteps
+	- Current Time: 17:45:32
+	- Message: The Drip Plate axis is at 0 of 0 microsteps
+	- Current Time: 17:45:38
+	- Message: 0 reached in 2.018841505050659 seconds for pipettor_gantry module along 4
+	- Current Time: 17:45:38
+	- Message: The Drip Plate axis is at 0 of 0 microsteps
+	- Current Time: 17:45:42
+	- Message: 0 reached in 16.780402183532715 seconds for pipettor_gantry module along 4
+	- Current Time: 17:45:42
+	- Message: The Z axis is at -431865 of -1080000 microsteps
+	- Current Time: 17:45:49
+	- Message: The Z axis is at -1079860 of -1080000 microsteps
+	- Current Time: 17:45:51
+	- Message: The Z axis is at -1080000 of -1080000 microsteps
+	- Current Time: 17:45:53
+	- Message: -1080000 reached in 6.479267597198486 seconds for pipettor_gantry module along 3
+	- Current Time: 17:45:53
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moved pipettor to mag_separator_row1.
+	- Current Time: 17:45:53
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 10 microliters using a 50 microliter tip at mag_separator_row1.
+	- Current Time: 17:45:53
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:45:54
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:45:56
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:46:0
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:46:2
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration complete.
+	- Current Time: 17:46:4
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to pcr_thermocycler_row1 with 50 uL tips.
+	- Current Time: 17:46:4
+	- Message: The Z axis is at -647993 of 0 microsteps
+	- Current Time: 17:46:10
+	- Message: The Z axis is at -193 of 0 microsteps
+	- Current Time: 17:46:12
+	- Message: The Z axis is at -9 of 0 microsteps
+	- Current Time: 17:46:14
+	- Message: The Z axis is at -9 of 0 microsteps
+	- Current Time: 17:46:16
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:46:23
+	- Message: 0 reached in 2.024768114089966 seconds for pipettor_gantry module along 3
+	- Current Time: 17:46:23
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:46:27
+	- Message: 0 reached in 19.014614582061768 seconds for pipettor_gantry module along 3
+	- Current Time: 17:46:27
+	- Message: The Drip Plate axis is at -550758 of -1198000 microsteps
+	- Current Time: 17:46:33
+	- Message: The Drip Plate axis is at -1198000 of -1198000 microsteps
+	- Current Time: 17:46:35
+	- Message: -1198000 reached in 4.252746105194092 seconds for pipettor_gantry module along 4
+	- Current Time: 17:46:35
+	- Message: The X axis is at -452300 of -452300 microsteps
+	- Current Time: 17:46:45
+	- Message: -452300 reached in 2.0239827632904053 seconds for pipettor_gantry module along 1
+	- Current Time: 17:46:45
+	- Message: The drip plate is in use.
+	- Current Time: 17:46:45
+	- Message: The Drip Plate axis is at -676757 of -400000 microsteps
+	- Current Time: 17:46:51
+	- Message: The Drip Plate axis is at -400000 of -400000 microsteps
+	- Current Time: 17:46:53
+	- Message: -400000 reached in 4.2454845905303955 seconds for pipettor_gantry module along 4
+	- Current Time: 17:46:53
+	- Message: The Z axis is at -431826 of -890000 microsteps
+	- Current Time: 17:47:0
+	- Message: The Z axis is at -890000 of -890000 microsteps
+	- Current Time: 17:47:2
+	- Message: -890000 reached in 4.248473882675171 seconds for pipettor_gantry module along 3
+	- Current Time: 17:47:2
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moved pipettor to pcr_thermocycler_row1.
+	- Current Time: 17:47:2
+Dispense Volume = 150
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:2
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:3
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:8
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:10
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 250 microliters using a 50 microliter tip at pcr_thermocycler_row1.
+	- Current Time: 17:47:12
+WARNING (utils, check_limit): 2500 <= 500 is False...
+WARNING
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Would aspirate too much, skipping...
+	- Current Time: 17:47:12
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration skipped...
+	- Current Time: 17:47:12
+Dispense Volume = 3000
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:14
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:15
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:20
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:22
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 250 microliters using a 50 microliter tip at pcr_thermocycler_row1.
+	- Current Time: 17:47:24
+WARNING (utils, check_limit): 2500 <= 500 is False...
+WARNING
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Would aspirate too much, skipping...
+	- Current Time: 17:47:24
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration skipped...
+	- Current Time: 17:47:24
+Dispense Volume = 3000
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:26
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:27
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:33
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:34
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 250 microliters using a 50 microliter tip at pcr_thermocycler_row1.
+	- Current Time: 17:47:36
+WARNING (utils, check_limit): 2500 <= 500 is False...
+WARNING
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Would aspirate too much, skipping...
+	- Current Time: 17:47:36
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration skipped...
+	- Current Time: 17:47:36
+Dispense Volume = 3000
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:38
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:40
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:45
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:47:46
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to tip_transfer_tray_row1 with 50 uL tips.
+	- Current Time: 17:47:48
+	- Message: The Z axis is at -457579 of 0 microsteps
+	- Current Time: 17:47:54
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:47:57
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:47:59
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:48:5
+	- Message: 0 reached in 2.02358078956604 seconds for pipettor_gantry module along 3
+	- Current Time: 17:48:5
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:48:9
+	- Message: 0 reached in 16.816997051239014 seconds for pipettor_gantry module along 3
+	- Current Time: 17:48:9
+	- Message: The Drip Plate axis is at -27530 of 0 microsteps
+	- Current Time: 17:48:15
+	- Message: The Drip Plate axis is at -29 of 0 microsteps
+	- Current Time: 17:48:18
+	- Message: The Drip Plate axis is at -29 of 0 microsteps
+	- Current Time: 17:48:20
+	- Message: The Drip Plate axis is at 0 of 0 microsteps
+	- Current Time: 17:48:26
+	- Message: 0 reached in 2.013683557510376 seconds for pipettor_gantry module along 4
+	- Current Time: 17:48:26
+	- Message: The Drip Plate axis is at 0 of 0 microsteps
+	- Current Time: 17:48:30
+	- Message: 0 reached in 16.77247190475464 seconds for pipettor_gantry module along 4
+	- Current Time: 17:48:30
+	- Message: The X axis is at -473000 of -473000 microsteps
+	- Current Time: 17:48:40
+	- Message: -473000 reached in 2.014986753463745 seconds for pipettor_gantry module along 1
+	- Current Time: 17:48:40
+	- Message: The Z axis is at -426825 of -1315000 microsteps
+	- Current Time: 17:48:46
+	- Message: The Z axis is at -1301879 of -1315000 microsteps
+	- Current Time: 17:48:48
+	- Message: The Z axis is at -1315000 of -1315000 microsteps
+	- Current Time: 17:48:51
+	- Message: -1315000 reached in 6.462001323699951 seconds for pipettor_gantry module along 3
+	- Current Time: 17:48:51
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moved pipettor to tip_transfer_tray_row1.
+	- Current Time: 17:48:51
+	- Message: The Z axis is at -1165211 of -1165000 microsteps
+	- Current Time: 17:49:5
+	- Message: The Z axis is at -1165000 of -1165000 microsteps
+	- Current Time: 17:49:7
+	- Message: -1165000 reached in 4.2556233406066895 seconds for pipettor_gantry module along 3
+	- Current Time: 17:49:7
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 1 - High Pressure Compressor (Tip Eject)
+	- Current Time: 17:49:7
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 1 - High Pressure Compressor (Tip Eject)
+	- Current Time: 17:49:9
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 1 - High Pressure Compressor (Tip Eject)
+	- Current Time: 17:49:9
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 1 - High Pressure Compressor (Tip Eject)
+	- Current Time: 17:49:11
+LOG-END
+	- Module: upper_gantry.py
+	- Function: tip_eject
+	- Message: Tips ejected in the Tip Transfer Tray, Row 1
+	- Current Time: 17:49:11
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to tip_transfer_tray_row2 with 50 uL tips.
+	- Current Time: 17:49:11
+	- Message: The Z axis is at -732830 of 0 microsteps
+	- Current Time: 17:49:17
+	- Message: The Z axis is at -1877 of 0 microsteps
+	- Current Time: 17:49:19
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:49:21
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:49:23
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:49:30
+	- Message: 0 reached in 2.0198488235473633 seconds for pipettor_gantry module along 3
+	- Current Time: 17:49:30
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:49:34
+	- Message: 0 reached in 19.033016443252563 seconds for pipettor_gantry module along 3
+	- Current Time: 17:49:34
+	- Message: The X axis is at -467000 of -467000 microsteps
+	- Current Time: 17:49:44
+	- Message: -467000 reached in 2.0220584869384766 seconds for pipettor_gantry module along 1
+	- Current Time: 17:49:44
+	- Message: The Z axis is at -431777 of -1315000 microsteps
+	- Current Time: 17:49:50
+	- Message: The Z axis is at -1303478 of -1315000 microsteps
+	- Current Time: 17:49:52
+	- Message: The Z axis is at -1315000 of -1315000 microsteps
+	- Current Time: 17:49:54
+	- Message: -1315000 reached in 6.48423957824707 seconds for pipettor_gantry module along 3
+	- Current Time: 17:49:54
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moved pipettor to tip_transfer_tray_row2.
+	- Current Time: 17:49:54
+	- Message: The Z axis is at -883039 of 0 microsteps
+	- Current Time: 17:50:0
+	- Message: The Z axis is at -11490 of 0 microsteps
+	- Current Time: 17:50:3
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:50:5
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:50:7
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:50:13
+	- Message: 0 reached in 2.022214651107788 seconds for pipettor_gantry module along 3
+	- Current Time: 17:50:13
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:50:17
+	- Message: 0 reached in 19.017518520355225 seconds for pipettor_gantry module along 3
+	- Current Time: 17:50:17
+LOG-START
+	- Module: upper_gantry.py
+	- Function: tip_pickup
+	- Message: Picking up tips from the Tip Transfer Tray, row 2
+	- Current Time: 17:50:17
+LOG-END
+	- Module: upper_gantry.py
+	- Function: tip_pickup
+	- Message: Tips picked up from Tip Transfer Tray, row 2
+	- Current Time: 17:50:17
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to reagent_cartridge_tray2_row2 with 50 uL tips.
+	- Current Time: 17:50:17
+	- Message: The Drip Plate axis is at -551995 of -1198000 microsteps
+	- Current Time: 17:50:26
+	- Message: The Drip Plate axis is at -1198000 of -1198000 microsteps
+	- Current Time: 17:50:28
+	- Message: -1198000 reached in 4.255146026611328 seconds for pipettor_gantry module along 4
+	- Current Time: 17:50:28
+	- Message: The X axis is at -255990 of -251500 microsteps
+	- Current Time: 17:50:38
+	- Message: The X axis is at -251500 of -251500 microsteps
+	- Current Time: 17:50:40
+	- Message: -251500 reached in 4.252485036849976 seconds for pipettor_gantry module along 1
+	- Current Time: 17:50:40
+	- Message: The drip plate is in use.
+	- Current Time: 17:50:40
+	- Message: The Drip Plate axis is at -653906 of -50000 microsteps
+	- Current Time: 17:50:46
+	- Message: The Drip Plate axis is at -50000 of -50000 microsteps
+	- Current Time: 17:50:48
+	- Message: -50000 reached in 4.252829313278198 seconds for pipettor_gantry module along 4
+	- Current Time: 17:50:48
+	- Message: The Z axis is at -432059 of -1255000 microsteps
+	- Current Time: 17:50:55
+	- Message: The Z axis is at -1249060 of -1255000 microsteps
+	- Current Time: 17:50:57
+	- Message: The Z axis is at -1255000 of -1255000 microsteps
+	- Current Time: 17:50:59
+	- Message: -1255000 reached in 6.486761569976807 seconds for pipettor_gantry module along 3
+	- Current Time: 17:50:59
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moved pipettor to reagent_cartridge_tray2_row2.
+	- Current Time: 17:50:59
+LOG-START
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspirating 25 microliters using a 50 microliter tip at reagent_cartridge_tray2_row2.
+	- Current Time: 17:50:59
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:51:0
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:51:2
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:51:7
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:51:8
+LOG-END
+	- Module: upper_gantry.py
+	- Function: aspirate
+	- Message: Aspiration complete.
+	- Current Time: 17:51:10
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to pcr_thermocycler_row1 with 50 uL tips.
+	- Current Time: 17:51:10
+	- Message: The Z axis is at -823064 of 0 microsteps
+	- Current Time: 17:51:16
+	- Message: The Z axis is at -5956 of 0 microsteps
+	- Current Time: 17:51:19
+	- Message: The Z axis is at -9 of 0 microsteps
+	- Current Time: 17:51:21
+	- Message: The Z axis is at -9 of 0 microsteps
+	- Current Time: 17:51:23
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:51:29
+	- Message: 0 reached in 2.0230066776275635 seconds for pipettor_gantry module along 3
+	- Current Time: 17:51:29
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:51:33
+	- Message: 0 reached in 19.025333642959595 seconds for pipettor_gantry module along 3
+	- Current Time: 17:51:33
+	- Message: The Drip Plate axis is at -593847 of -1198000 microsteps
+	- Current Time: 17:51:39
+	- Message: The Drip Plate axis is at -1198000 of -1198000 microsteps
+	- Current Time: 17:51:42
+	- Message: -1198000 reached in 4.248265504837036 seconds for pipettor_gantry module along 4
+	- Current Time: 17:51:42
+	- Message: The X axis is at -449555 of -452300 microsteps
+	- Current Time: 17:51:52
+	- Message: The X axis is at -452300 of -452300 microsteps
+	- Current Time: 17:51:54
+	- Message: -452300 reached in 4.257728099822998 seconds for pipettor_gantry module along 1
+	- Current Time: 17:51:54
+	- Message: The drip plate is in use.
+	- Current Time: 17:51:54
+	- Message: The Drip Plate axis is at -670936 of -400000 microsteps
+	- Current Time: 17:52:0
+	- Message: The Drip Plate axis is at -400000 of -400000 microsteps
+	- Current Time: 17:52:2
+	- Message: -400000 reached in 4.256214618682861 seconds for pipettor_gantry module along 4
+	- Current Time: 17:52:2
+	- Message: The Z axis is at -431944 of -890000 microsteps
+	- Current Time: 17:52:8
+	- Message: The Z axis is at -890000 of -890000 microsteps
+	- Current Time: 17:52:11
+	- Message: -890000 reached in 4.252855539321899 seconds for pipettor_gantry module along 3
+	- Current Time: 17:52:11
+LOG-END
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moved pipettor to pcr_thermocycler_row1.
+	- Current Time: 17:52:11
+Dispense Volume = 300
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turning on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:52:11
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_on_air_valve
+	- Message: Turned on Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:52:12
+Channel 0 Action Status: Action completed successfully
+Channel 1 Action Status: Action completed successfully
+Channel 2 Action Status: Action completed successfully
+Channel 3 Action Status: Action completed successfully
+Channel 4 Action Status: Action completed successfully
+Channel 5 Action Status: Action completed successfully
+Channel 6 Action Status: Action completed successfully
+Channel 7 Action Status: Action completed successfully
+LOG-START
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turning off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:52:17
+LOG-END
+	- Module: upper_gantry.py
+	- Function: turn_off_air_valve
+	- Message: Turned off Air Valve 2 - Pipettor Vacuum (Aspirate or Dispense)
+	- Current Time: 17:52:18
+LOG-START
+	- Module: upper_gantry.py
+	- Function: move_pipettor
+	- Message: Moving the pipettor to tip_transfer_tray_row1 with 50 uL tips.
+	- Current Time: 17:52:20
+	- Message: The Z axis is at -457894 of 0 microsteps
+	- Current Time: 17:52:26
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:52:29
+	- Message: The Z axis is at -10 of 0 microsteps
+	- Current Time: 17:52:31
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:52:37
+	- Message: 0 reached in 2.015211820602417 seconds for pipettor_gantry module along 3
+	- Current Time: 17:52:37
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:52:41
+	- Message: 0 reached in 16.76980495452881 seconds for pipettor_gantry module along 3
+	- Current Time: 17:52:41
+	- Message: The Drip Plate axis is at -27543 of 0 microsteps
+	- Current Time: 17:52:47
+	- Message: The Drip Plate axis is at -29 of 0 microsteps
+	- Current Time: 17:52:49
+	- Message: The Drip Plate axis is at -29 of 0 microsteps
+	- Current Time: 17:52:52
+	- Message: The Drip Plate axis is at 0 of 0 microsteps
+	- Current Time: 17:52:58
+	- Message: 0 reached in 2.0249977111816406 seconds for pipettor_gantry module along 4
+	- Current Time: 17:52:58
+	- Message: The Drip Plate axis is at 0 of 0 microsteps
+	- Current Time: 17:53:2
+	- Message: 0 reached in 16.793267250061035 seconds for pipettor_gantry module along 4
+	- Current Time: 17:53:2
+	- Message: The X axis is at -473000 of -473000 microsteps
+	- Current Time: 17:53:12
+	- Message: -473000 reached in 2.0148115158081055 seconds for pipettor_gantry module along 1
+	- Current Time: 17:53:12
+	- Message: The Z axis is at -431991 of -1315000 microsteps
+	- Current Time: 17:53:18
+	- Message: The Z axis is at 0 of -1315000 microsteps
+	- Current Time: 17:53:20
+	- Message: The Z axis is at 0 of -1315000 microsteps
+	- Current Time: 17:53:22
+	- Message: The Z axis is at 0 of 0 microsteps
+	- Current Time: 17:53:29
+	- Message: 0 reached in 2.0241167545318604 seconds for pipettor_gantry module along 3
+	- Current Time: 17:53:29
+	- Message: The Z axis is at 0 of -1315000 microsteps
+	- Current Time: 17:53:35
+	- Message: The Z axis is at 0 of -1315000 microsteps
+	- Current Time: 17:53:37

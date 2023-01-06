@@ -552,7 +552,7 @@ class App(ctk.CTk):
 			self.label_build_protocol_other_options.place(x=150, y=250)
 			self.build_protocol_other_sv = StringVar()
 			self.build_protocol_other_sv.set("Home Pipettor")
-			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=("Home Pipettor", "Move Relative Left", "Move Relative Right", "Move Relative Backwards", "Move Relative Forwards", "Move Relative Down", "Move Relative Up", 'Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet', "Pre-Amp Thermocycle (Not Functional)", "Move Lid (Not Functional)", "Move Chip (Not Functional)"))
+			self.optionmenu_build_protocol_other = ctk.CTkOptionMenu(master=self.frame_right, variable=self.build_protocol_other_sv, values=("Home Pipettor", "Tip Press for 50 uL tips", "Tip Press for 1000 uL tips", "Move Relative Left", "Move Relative Right", "Move Relative Backwards", "Move Relative Forwards", "Move Relative Down", "Move Relative Up", 'Generate Standard Droplets', 'Generate Pico Droplets', 'Extraction', 'Transfer Plasma', 'Binding', 'Pooling', 'Wash 1', 'Wash 2', 'Pre-Elution', 'Elution', 'Assay Prep', 'Pre-Amp', 'Shake On', 'Shake Off', 'Engage Magnet', 'Disengage Magnet', "Pre-Amp Thermocycle (Not Functional)", "Move Lid (Not Functional)", "Move Chip (Not Functional)"))
 			self.optionmenu_build_protocol_other.place(x=85, y=280, width=200)
 			# Other: Add
 			self.label_build_protocol_time_add = ctk.CTkLabel(master=self.frame_right, text='Add', font=("Roboto Light", -14))
@@ -1055,6 +1055,7 @@ class App(ctk.CTk):
 				time_unit = split[-1]
 				delay(time_value, time_unit)
 			elif "Home Pipettor" in action_msg:
+				self.upper_gantry.move_pipettor('home', use_drip_plate=False)
 				self.upper_gantry.home_pipettor()
 			elif "Transfer Plasma" in action_msg:
 				self.script.transfer_plasma(self.upper_gantry, full_protocol=False)
@@ -1102,6 +1103,8 @@ class App(ctk.CTk):
 				self.upper_gantry.move_relative('forwards', delta, velocity='fast')
 			elif "Pre-Amp Thermocycle" in action_msg:
 				print('thermocycle')
+			elif "Tip Press for 50 uL tips" in action_msg:
+				a = [-427900, -1435000, -840000]
 			# Update the progress bar for the protocol
 			#self.progressbar_build_protocol['value'] = int((i+1) / (n_tasks)) * 100
 			self.progressbar_build_protocol.set((i+1) / (n_tasks))
@@ -2082,12 +2085,9 @@ Times:
 		#os.system(f"copy coordinate_{unit}.py {coordinate_file_name}")
 
 
-	def test(self, event):
-		print("HE")
-
 if __name__ == '__main__':
 	app = App()
-	unit = 'A'
+	unit = 'D'
 	app.settings_unit_sv.set(unit)
 	# Copy the unit coordinate file to coordinate.py
 	coordinate_file_name = 'coordinate.py'

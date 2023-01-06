@@ -1,0 +1,185 @@
+LOG-START
+	- Module: CDP2p0.py
+	- Function: main
+	- Message: Starting script CDP2p0.py
+	- Current Time: 11:21:51
+LOG-START
+	- Module: upper_gantry.py
+	- Function: upper_gantry
+	- Message: Initializing the Upper Gantry.
+	- Current Time: 11:21:51
+	- Message: Turning on Relay 8 - Heater/Shaker and Chiller.
+	- Current Time: 11:21:52
+		- Message (SEND): http://127.0.0.1:8000/chassis/relay/7?state=True
+		- Message (RECEIVED): Status Code: OK
+LOG-END
+	- Module: upper_gantry.py
+	- Function: upper_gantry
+	- Message: Initialization of the Upper Gantry is complete.
+	- Current Time: 11:21:52
+*** DEVICE INFORMATION ***
+
+Device control information not available.
+3
+-3000
+HERE: 3
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2005830,"message":">4,d84c,?pos,7652","response":"<4,d84c,0,0\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/4?position=-3000&velocity=10000
+		- Message (RECEIVED): Status Code: OK
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5?channel=5
+		- Message (RECEIVED): Status Code: OK
+	- Message: Delay set for 5 seconds
+	- Current Time: 11:22:0
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2006885,"message":">4,21d4,?pos,8bab","response":"<4,21d4,0,-3000\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/home/4
+		- Message (RECEIVED): Status Code: OK
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2005402,"message":">4,594a,?pos,2a57","response":"<4,594a,0,0\r"}
+	- Message: The Filter Wheel axis is at 0 of 0 microsteps
+	- Current Time: 11:22:11
+	- Message: 0 reached in 2.0129683017730713 seconds for reader module along Filter Wheel
+	- Current Time: 11:22:11
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5/off?channel=3
+		- Message (RECEIVED): Status Code: OK
+5
+-12000
+HERE: 5
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2010977,"message":">4,1e38,?pos,d103","response":"<4,1e38,0,0\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/4?position=-12000&velocity=10000
+		- Message (RECEIVED): Status Code: OK
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5?channel=5
+		- Message (RECEIVED): Status Code: OK
+	- Message: Delay set for 5 seconds
+	- Current Time: 11:22:19
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2010389,"message":">4,5e47,?pos,c36c","response":"<4,5e47,0,-12000\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/home/4
+		- Message (RECEIVED): Status Code: OK
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2008344,"message":">4,bbac,?pos,dca6","response":"<4,bbac,0,-8433\r"}
+	- Message: The Filter Wheel axis is at -8433 of 0 microsteps
+	- Current Time: 11:22:30
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2007002,"message":">4,7e09,?pos,28a4","response":"<4,7e09,0,-4490\r"}
+	- Message: The Filter Wheel axis is at -4490 of 0 microsteps
+	- Current Time: 11:22:32
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2006293,"message":">4,abed,?pos,7d1b","response":"<4,abed,0,-548\r"}
+	- Message: The Filter Wheel axis is at -548 of 0 microsteps
+	- Current Time: 11:22:34
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2014297,"message":">4,5902,?pos,3912","response":"<4,5902,0,0\r"}
+	- Message: The Filter Wheel axis is at 0 of 0 microsteps
+	- Current Time: 11:22:37
+	- Message: 0 reached in 8.679959535598755 seconds for reader module along Filter Wheel
+	- Current Time: 11:22:37
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5/off?channel=5
+		- Message (RECEIVED): Status Code: OK
+1
+-21500
+HERE: 1
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2006419,"message":">4,4ba2,?pos,82b2","response":"<4,4ba2,0,0\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/4?position=-21500&velocity=10000
+		- Message (RECEIVED): Status Code: OK
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5?channel=1
+		- Message (RECEIVED): Status Code: OK
+	- Message: Delay set for 5 seconds
+	- Current Time: 11:22:45
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2008401,"message":">4,eb66,?pos,d924","response":"<4,eb66,0,-21500\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/home/4
+		- Message (RECEIVED): Status Code: OK
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2007784,"message":">4,a424,?pos,23dc","response":"<4,a424,0,-17932\r"}
+	- Message: The Filter Wheel axis is at -17932 of 0 microsteps
+	- Current Time: 11:22:56
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2011501,"message":">4,2d42,?pos,6b47","response":"<4,2d42,0,-13970\r"}
+	- Message: The Filter Wheel axis is at -13970 of 0 microsteps
+	- Current Time: 11:22:58
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2005712,"message":">4,4d67,?pos,1fbc","response":"<4,4d67,0,0\r"}
+	- Message: The Filter Wheel axis is at 0 of 0 microsteps
+	- Current Time: 11:23:0
+	- Message: 0 reached in 6.458850860595703 seconds for reader module along Filter Wheel
+	- Current Time: 11:23:0
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5/off?channel=1
+		- Message (RECEIVED): Status Code: OK
+6
+-29000
+HERE: 6
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2005656,"message":">4,e455,?pos,fe1b","response":"<4,e455,0,0\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/4?position=-29000&velocity=10000
+		- Message (RECEIVED): Status Code: OK
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5?channel=6
+		- Message (RECEIVED): Status Code: OK
+	- Message: Delay set for 5 seconds
+	- Current Time: 11:23:8
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2006158,"message":">4,2859,?pos,c0e3","response":"<4,2859,0,-29000\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/home/4
+		- Message (RECEIVED): Status Code: OK
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2006190,"message":">4,940f,?pos,e81b","response":"<4,940f,0,-25432\r"}
+	- Message: The Filter Wheel axis is at -25432 of 0 microsteps
+	- Current Time: 11:23:19
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2005670,"message":">4,1a3f,?pos,b076","response":"<4,1a3f,0,-21489\r"}
+	- Message: The Filter Wheel axis is at -21489 of 0 microsteps
+	- Current Time: 11:23:22
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2008611,"message":">4,fec7,?pos,94","response":"<4,fec7,0,-17528\r"}
+	- Message: The Filter Wheel axis is at -17528 of 0 microsteps
+	- Current Time: 11:23:24
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2011002,"message":">4,6c2c,?pos,9283","response":"<4,6c2c,0,0\r"}
+	- Message: The Filter Wheel axis is at 0 of 0 microsteps
+	- Current Time: 11:23:26
+	- Message: 0 reached in 8.687231540679932 seconds for reader module along Filter Wheel
+	- Current Time: 11:23:26
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5/off?channel=6
+		- Message (RECEIVED): Status Code: OK
+2
+-37000
+HERE: 2
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2007491,"message":">4,9439,?pos,2970","response":"<4,9439,0,0\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/4?position=-37000&velocity=10000
+		- Message (RECEIVED): Status Code: OK
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5?channel=2
+		- Message (RECEIVED): Status Code: OK
+	- Message: Delay set for 5 seconds
+	- Current Time: 11:23:34
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2008745,"message":">4,ea99,?pos,c62b","response":"<4,ea99,0,-37000\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/home/4
+		- Message (RECEIVED): Status Code: OK
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2006660,"message":">4,affe,?pos,9132","response":"<4,affe,0,-33413\r"}
+	- Message: The Filter Wheel axis is at -33413 of 0 microsteps
+	- Current Time: 11:23:45
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2007242,"message":">4,44e2,?pos,56d9","response":"<4,44e2,0,-29470\r"}
+	- Message: The Filter Wheel axis is at -29470 of 0 microsteps
+	- Current Time: 11:23:47
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2004204,"message":">4,a8f9,?pos,3ea7","response":"<4,a8f9,0,0\r"}
+	- Message: The Filter Wheel axis is at 0 of 0 microsteps
+	- Current Time: 11:23:50
+	- Message: 0 reached in 6.457200527191162 seconds for reader module along Filter Wheel
+	- Current Time: 11:23:50
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5/off?channel=2
+		- Message (RECEIVED): Status Code: OK
+4
+-47000
+HERE: 4
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2006248,"message":">4,20c1,?pos,e906","response":"<4,20c1,0,0\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/4?position=-47000&velocity=10000
+		- Message (RECEIVED): Status Code: OK
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5?channel=4
+		- Message (RECEIVED): Status Code: OK
+	- Message: Delay set for 5 seconds
+	- Current Time: 11:23:58
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2008644,"message":">4,831b,?pos,b782","response":"<4,831b,0,-47000\r"}
+		- Message (SEND): http://127.0.0.1:8000/reader/axis/home/4
+		- Message (RECEIVED): Status Code: OK
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2007921,"message":">4,a71,?pos,7432","response":"<4,a71,0,-43431\r"}
+	- Message: The Filter Wheel axis is at -43431 of 0 microsteps
+	- Current Time: 11:24:9
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2011844,"message":">4,354,?pos,1733","response":"<4,354,0,-39467\r"}
+	- Message: The Filter Wheel axis is at -39467 of 0 microsteps
+	- Current Time: 11:24:11
+		- Message (RECEIVED): {"_sid":3,"_mid":4,"_duration_us":2009807,"message":">4,7326,?pos,baa","response":"<4,7326,0,0\r"}
+	- Message: The Filter Wheel axis is at 0 of 0 microsteps
+	- Current Time: 11:24:13
+	- Message: 0 reached in 6.454458236694336 seconds for reader module along Filter Wheel
+	- Current Time: 11:24:13
+		- Message (SEND): http://127.0.0.1:8000/reader/led/5/off?channel=4
+		- Message (RECEIVED): Status Code: OK
+		- Message (SEND): http://127.0.0.1:8000/chassis/relay/7?state=False
+		- Message (RECEIVED): Status Code: OK
+LOG-END
+	- Module: CDP2p0.py
+	- Function: main
+	- Message: Done running script CDP2p0.py
+	- Current Time: 11:24:15
