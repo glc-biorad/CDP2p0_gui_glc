@@ -1,0 +1,18 @@
+Pickup tips Tray A Column 1
+Move to Sample Rack Tray A with 1000 uL tips
+Aspirate 500 uL with 1000 uL tips at high pressure
+Move to Heater/Shaker Column 1 with 1000 uL tips
+Dispense 500 uL with 1000 uL tips at high pressure
+Move to Sample Rack Tray A with 1000 uL tips
+Aspirate 500 uL with 1000 uL tips at high pressure
+Move to Heater/Shaker Column 2 with 1000 uL tips
+Dispense 500 uL with 1000 uL tips at high pressure
+Move to Sample Rack Tray A with 1000 uL tips
+Aspirate 500 uL with 1000 uL tips at high pressure
+Move to Heater/Shaker Column 3 with 1000 uL tips
+Dispense 500 uL with 1000 uL tips at high pressure
+Aspirate 500 uL with 1000 uL tips at high pressure
+Move to Sample Rack Tray A with 1000 uL tips
+Move to Heater/Shaker Column 4 with 1000 uL tips
+Dispense 500 uL with 1000 uL tips at high pressure
+Eject tips Tray A Column 1

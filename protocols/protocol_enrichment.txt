@@ -1,0 +1,135 @@
+Pickup tips Tray A Column 6
+Move to Mag Separator Column 1 with 50 uL tips
+Aspirate 40 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 2 with 50 uL tips
+Dispense 40 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 1 with 50 uL tips
+Aspirate 40 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 2 with 50 uL tips
+Dispense 40 uL with 50 uL tips at high pressure
+Disengage Magnet
+Eject tips Tray A Column 6
+Pickup tips Tray A Column 7
+Move to Reagent Cartridge Tray A Column 7 with 50 uL tips
+Aspirate 48 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 2 with 50 uL tips
+Dispense 48 uL with 50 uL tips at low pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at low pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at high pressure
+Delay for 9 minutes
+Engage Magnet
+Delay for 1 minute
+Aspirate 43 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Dispense 43 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 2 with 50 uL tips
+Aspirate 43 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Dispense 43 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 2 with 50 uL tips
+Aspirate 43 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Dispense 43 uL with 50 uL tips at high pressure
+Disengage Magnet
+Move to Reagent Cartridge Tray A Column 7 with 50 uL tips
+Aspirate 36 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Dispense 36 uL with 50 uL tips at low pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at low pressure
+Move to Reagent Cartridge Tray A Column 7 with 50 uL tips
+Aspirate 36 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Dispense 36 uL with 50 uL tips at low pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at low pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Mix 40 uL with 50 uL tips at high pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at low pressure
+Delay for 10 minutes
+Engage Magnet
+Delay for 1 minute
+Aspirate 50 uL with 50 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 2 with 50 uL tips
+Dispense 50 uL with 50 uL tips at high pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Aspirate 50 uL with 50 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 2 with 50 uL tips
+Dispense 50 uL with 50 uL tips at high pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Aspirate 50 uL with 50 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 2 with 50 uL tips
+Dispense 50 uL with 50 uL tips at high pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Aspirate 50 uL with 50 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 2 with 50 uL tips
+Dispense 50 uL with 50 uL tips at high pressure
+Delay for 3 seconds
+Dispense 10 uL with 50 uL tips at high pressure
+Eject tips Tray A Column 7
+Pickup tips Tray A Column 3
+Disengage Magnet
+Move to Reagent Cartridge Tray A Column 10 with 1000 uL tips
+Aspirate 200 uL with 1000 uL tips at high pressure
+Move to Mag Separator Column 3 with 1000 uL tips
+Dispense 200 uL with 1000 uL tips at high pressure
+Engage Magnet
+Delay for 1 minute
+Aspirate 200 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 2 with 1000 uL tips
+Dispense 200 uL with 1000 uL tips at high pressure
+Disengage Magnet
+Move to Reagent Cartridge Tray A Column 10 with 1000 uL tips
+Aspirate 200 uL with 1000 uL tips at high pressure
+Move to Mag Separator Column 3 with 1000 uL tips
+Dispense 200 uL with 1000 uL tips at high pressure
+Engage Magnet
+Delay for 1 minute
+Aspirate 200 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 2 with 1000 uL tips
+Dispense 200 uL with 1000 uL tips at high pressure
+Eject tips Tray A Column 3
+Pickup tips Tray A Column 5
+Move to Mag Separator Column 3 with 50 uL tips
+Aspirate 20 uL with 50 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 2 with 50 uL tips
+Dispense 20 uL with 50 uL tips at high pressure
+Eject tips Tray A Column 5
+Delay for 3 minutes
+Pickup tips Tray A Column 8
+Disengage Magnet
+Move to Reagent Cartridge Tray A Column 5 with 50 uL tips
+Aspirate 36 uL with 50 uL tips at high pressure
+Move to Mag Separator Column 3 with 50 uL tips
+Dispense 36 uL with 50 uL tips at high pressure
+Mix 20 uL with 50 uL tips at high pressure
+Mix 20 uL with 50 uL tips at high pressure
+Mix 20 uL with 50 uL tips at high pressure
+Mix 20 uL with 50 uL tips at high pressure
+Mix 20 uL with 50 uL tips at high pressure
+Delay for 1 minute
+Engage Magnet
+Eject tips Tray A Column 8

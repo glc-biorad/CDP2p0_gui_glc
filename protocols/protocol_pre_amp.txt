@@ -1,0 +1,49 @@
+Pickup tips Tray A Column 6
+Move to Mag Separator Column 1 with 50 uL tips
+Aspirate 7 uL with 50 uL tips at high pressure
+Move to Assay Strip Column 2 with 50 uL tips
+Dispense 7 uL with 50 uL tips at high pressure
+Aspirate 20 uL with 50 uL tips at high pressure
+Dispense 20 uL with 50 uL tips at high pressure
+Aspirate 20 uL with 50 uL tips at high pressure
+Dispense 20 uL with 50 uL tips at high pressure
+Aspirate 20 uL with 50 uL tips at high pressure
+Dispense 20 uL with 50 uL tips at high pressure
+Aspirate 25 uL with 50 uL tips at high pressure
+Move to Pre-Amp Column 1 with 50 uL tips
+Dispense 25 uL with 50 uL tips at high pressure
+Delay for 1 second
+Dispense 5 uL with 50 uL tips at low pressure
+Eject tips Tray A Column 6
+Pickup tips Tray A Column 7
+Move to Reagent Cartridge Tray A Column 7 with 50 uL tips
+Aspirate 30 uL with 50 uL tips at high pressure
+Move to Pre-Amp Column 1 with 50 uL tips
+Dispense 25 uL with 50 uL tips at low pressure
+Eject tips Tray A Column 7
+Pickup tips Tray A Column 6
+Move to Pre-Amp Column 1 with 50 uL tips
+Aspirate 10 uL with 50 uL tips at high pressure
+Move to Pre-Amp Column 2 with 50 uL tips
+Dispense 10 uL with 50 uL tips at high pressure
+Eject tips Tray A Column 6
+Pickup tips Tray A Column 8
+Move to Reagent Cartridge Tray A Column 5 with 50 uL tips
+Aspirate 30 uL with 50 uL tips at high pressure
+Move to Pre-Amp Column 2 with 50 uL tips
+Dispense 30 uL with 50 uL tips at high pressure
+Aspirate 30 uL with 50 uL tips at high pressure
+Dispense 30 uL with 50 uL tips at high pressure
+Aspirate 30 uL with 50 uL tips at high pressure
+Dispense 30 uL with 50 uL tips at high pressure
+Aspirate 7 uL with 50 uL tips at high pressure
+Move to Assay Strip Column 3 with 50 uL tips
+Dispense 7 uL with 50 uL tips at high pressure
+Aspirate 20 uL with 50 uL tips at high pressure
+Dispense 20 uL with 50 uL tips at high pressure
+Aspirate 20 uL with 50 uL tips at high pressure
+Dispense 20 uL with 50 uL tips at high pressure
+Aspirate 20 uL with 50 uL tips at high pressure
+Dispense 20 uL with 50 uL tips at high pressure
+Aspirate 22 uL with 50 uL tips at high pressure
+Generate Standard Droplets

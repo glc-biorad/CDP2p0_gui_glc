@@ -1,0 +1,25 @@
+Pickup tips Tray A Column 1
+Move to Reagent Cartridge Tray A Column 1 with 1000 uL tips
+Aspirate 1000 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 2 with 1000 uL tips
+Dispense 200 uL with 1000 uL tips at low pressure
+Move to Reagent Cartridge Tray A Column 3 with 1000 uL tips
+Dispense 100 uL with 1000 uL tips at low pressure
+Move to Reagent Cartridge Tray A Column 4 with 1000 uL tips
+Dispense 50 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 5 with 1000 uL tips
+Dispense 50 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 6 with 1000 uL tips
+Dispense 50 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 7 with 1000 uL tips
+Dispense 50 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 8 with 1000 uL tips
+Dispense 50 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 9 with 1000 uL tips
+Dispense 50 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 10 with 1000 uL tips
+Dispense 100 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 11 with 1000 uL tips
+Dispense 100 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 12 with 1000 uL tips
+Dispense 200 uL with 1000 uL tips at high pressure

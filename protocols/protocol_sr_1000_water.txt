@@ -1,0 +1,10 @@
+Pickup tips Tray A Column 1
+Move to Reagent Cartridge Tray A Column 1 with 1000 uL tips
+Aspirate 1000 uL with 1000 uL tips at high pressure
+Move to Sample Rack Tray A with 1000 uL tips
+Dispense 1000 uL with 1000 uL tips at high pressure
+Delay for 5 seconds
+Aspirate 1000 uL with 1000 uL tips at high pressure
+Move to Reagent Cartridge Tray A Column 1 with 1000 uL tips
+Dispense 1000 uL with 1000 uL tips at high pressure
+Eject tips Tray A Column 1
